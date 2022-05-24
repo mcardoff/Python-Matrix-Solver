@@ -1,8 +1,12 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 def main():
-    # tests if you can generate a ISW object
+    # tests if you can generate a ISW object, plots basis 
     ISW = InfiniteSquareWell()
+    for func in ISW.basis_funcs:
+        plt.plot(ISW.xvals, func)
+    plt.show()
 
 class InfiniteSquareWell:
     def __init__(self, well_width=1.0, steps=200,
