@@ -1,7 +1,10 @@
 import numpy as np
 
+def main():
+    # tests if you can generate a ISW object
+    ISW = InfiniteSquareWell()
+
 class InfiniteSquareWell:
-    # PI = np.pi
     def __init__(self, well_width=1.0, steps=200,
                  energy_eigenvals=5, hbar=1.0, mass=1.0):
         self.well_width = well_width
@@ -18,15 +21,20 @@ class InfiniteSquareWell:
         
         self.generate_basis_funcs()
 
-    def generate_basis_funcs():
+    def generate_basis_funcs(self):
         # know how to generate the infinite square well basis
-        self.xvals = np.linspace(0, self.well_width, self.steps+1)
+        PI = np.pi
+        L = self.well_width
+        self.xvals = np.linspace(0, L, self.steps+1)
         for n in range(1,self.energy_eigenvals):
-            energy = (n * self.hbar * PI / self.well_width) / (2.0 * self.mass)
+            energy = (n * self.hbar * PI / L) ** 2 / (2.0*self.mass)
             eigenfunc = []
             
             for x in self.xvals:
-                eigenfunc.append(np.sqrt(2/self.well_width) * np.sin(n*PI*x/L))
+                eigenfunc.append(np.sqrt(2/L)*np.sin(n*PI*x/L))
 
             self.eigenvals.append(energy)
             self.basis_funcs.append(eigenfunc)
+
+if __name__ == "__main__":
+    main()
