@@ -30,7 +30,7 @@ class InfiniteSquareWell:
         PI = np.pi
         L = self.well_width
         self.xvals = np.linspace(0, L, self.steps+1)
-        for n in range(1,self.energy_eigenvals):
+        for n in range(1,self.energy_eigenvals+1):
             energy = (n * self.hbar * PI / L) ** 2 / (2.0*self.mass)
             eigenfunc = []
             
