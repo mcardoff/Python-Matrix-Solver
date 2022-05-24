@@ -12,7 +12,7 @@ def main():
     ISW = InfiniteSquareWell()
     # choose potential
     potential = PotentialType.linear
-    V = potential.get_potential(ISW)
+    V = potential.get_potential(ISW,1.0)
     # compute hamiltonian matrix from the potential 
     H = compute_hamiltonian(V, ISW)
     # diagonalize hamiltonian, getting eigenvals and eigenvecs

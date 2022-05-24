@@ -1,13 +1,23 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from enum import Enum, auto
 from infinitesquarewell import InfiniteSquareWell
+
+def main():
+    ISW = InfiniteSquareWell()
+    potential = PotentialType.linear
+    V = potential.get_potential(ISW,1.0)
+    plt.plot(ISW.xvals, V)
+    plt.show()
 
 MXVAL = 10000.0
 
 def general_well(ISW,f):
     ret = [MXVAL]
-    
-    ret.append(f(x) for x in np.arange(ISW.step_size, ISW.well_width-ISW.step_size,ISW.step_size))
+
+    for x in ISW.xvals[1:len(ISW.xvals)-1]:
+        ret.append(f(x))
+    # ret.append(f(x) for x in np.arange(ISW.step_size, ISW.well_width-ISW.step_size,ISW.step_size))
     
     ret.append(MXVAL)
 
@@ -112,25 +122,28 @@ class PotentialType(Enum):
     # coupled_square_plus_field = auto()
     # kronig_penney = auto()
 
-    def get_potential(self, ISW):
+    def get_potential(self, ISW, amplitude):
         assert(isinstance(ISW, InfiniteSquareWell))
         if self is PotentialType.square:
-            return square(ISW)
+            return square(ISW,amplitude)
         elif self is PotentialType.linear:
-            return linear(ISW)
+            return linear(ISW,amplitude)
         elif self is PotentialType.quadratic:
-            return quadratic(ISW)
+            return quadratic(ISW,amplitude)
         elif self is PotentialType.centered_quadratic:
-            return centered_quadratic(ISW)
+            return centered_quadratic(ISW,amplitude)
         elif self is PotentialType.square_barrier:
-            return square_barrier(ISW)
+            return square_barrier(ISW,amplitude)
         elif self is PotentialType.square_plus_linear:
-            return square_plus_linear(ISW)
+            return square_plus_linear(ISW,amplitude)
         elif self is PotentialType.triangle_barrier:
-            return triangle_barrier(ISW)
+            return triangle_barrier(ISW,amplitude)
         # elif self is PotentialType.coupled_quadratic:
         #     return coupled_quadratic(ISW)
         # elif self is PotentialType.coupled_square_plus_field:
         #     return coupled_square_plus_field(ISW)
         # elif self is PotentialType.kronig_penney:
         #     return kronig_penney(ISW)
+
+if __name__ == "__main__":
+    main()
