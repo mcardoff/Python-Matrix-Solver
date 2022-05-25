@@ -8,7 +8,6 @@ from infinitesquarewell import InfiniteSquareWell
 from generatehamiltonian import *
 
 def main():
-    # w, v = la.eig(np.diag((1, 2)))
     # get infinite square well basis
     ISW = InfiniteSquareWell()
     # choose potential
@@ -20,24 +19,18 @@ def main():
     vals, vecs = la.eig(H)
     # new functions are the eigenvectors time the eigenfunctions of ISW
     newfuncs = []
-    for vec in vecs:
-        lin_combination = []
-        first_run = True
-        for (i,val) in enumerate(vec):
-            if first_run:
-                # need to build up list
-                for (j,basis_val) in enumerate(ISW.basis_funcs[i]):
-                    lin_combination.append(vec[i] * ISW.basis_funcs[i][j])
-                first_run = False
-            else:
-                for (j,basis_val) in enumerate(ISW.basis_funcs[i]):
-                    lin_combination[j] += vec[i] * basis_val
-
-        # one linear combination is built
+    for col in np.transpose(vecs):
+        lin_combination = np.zeros(len(ISW.basis_funcs[0]))
+        for (i,val) in enumerate(col):
+            lin_combination += np.multiply(ISW.basis_funcs[i],val)
         newfuncs.append(lin_combination)
 
-    # for func in newfuncs:
-    plt.plot(ISW.xvals, newfuncs[0])
+    x = ISW.xvals
+    plt.xlim(0, 1)
+    plt.ylim(-2, 2)
+    plt.plot(x,V,'black')
+    for func in newfuncs:
+        plt.plot(x, func)
 
     plt.show()
 
