@@ -17,7 +17,7 @@ from window_events import *
 
 def solve_problem():
         # get infinite square well basis
-    ISW = InfiniteSquareWell()
+    ISW = InfiniteSquareWell(energy_eigenvals=20)
     # choose potential
     potential = PotentialType.linear
     V = potential.get_potential(ISW,100.0)
@@ -43,7 +43,7 @@ def solve_problem():
 
     # plt.show()
     
-    return (x,newfuncs)
+    return (x,newfuncs,V)
 
 def main():
     global canvas,toolbar,selector
@@ -52,7 +52,7 @@ def main():
 
     selector = 0
 
-    x,funcs = solve_problem()
+    x,funcs,V = solve_problem()
 
     fig = Figure(figsize=(5, 4), dpi=100)
     
@@ -68,16 +68,26 @@ def main():
     toolbar.update()
     canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
-    button = tkinter.Button(master=root, text="Quit", command=_quit)
-    button.pack(side=tkinter.BOTTOM)
+    # buttons
+    quit_button = tkinter.Button(master=root, text="Quit",
+            command=lambda: _quit(root))
+    quit_button.pack(side=tkinter.LEFT)
 
-    selector_button = tkinter.Button(master=root, text="Next Plot",
+    next_button = tkinter.Button(master=root, text="Next Plot",
             command=lambda: inc_selector(subfig,x,funcs))
-    selector_button.pack(side=tkinter.BOTTOM)
+    next_button.pack(side=tkinter.LEFT)
+
+    prev_button = tkinter.Button(master=root, text="Prev Plot",
+            command=lambda: dec_selector(subfig,x,funcs))
+    prev_button.pack(side=tkinter.LEFT)
+
+    potential_button = tkinter.Button(master=root, text="Plot Potential",
+                                      command=lambda: plot_potential(subfig,x,V))
+    potential_button.pack(side=tkinter.LEFT)
     
     tkinter.mainloop()
 
-def _quit():
+def _quit(root):
     root.quit()     # stops mainloop
     root.destroy()  # this is necessary on Windows to prevent
                     # Fatal Python Error: PyEval_RestoreThread: NULL tstate
@@ -87,11 +97,31 @@ def inc_selector(subfig,x,funcs):
     subfig.clear()
     subfig.set_xlim(0,max(x))
     subfig.set_ylim(-2,2)
-    subfig.plot(x,funcs[selector])
     if selector < len(funcs)-1:
         selector += 1
     else:
         selector = 0
+    subfig.plot(x,funcs[selector])
+    canvas.draw()
+
+def dec_selector(subfig,x,funcs):
+    global canvas,selector
+    subfig.clear()
+    subfig.set_xlim(0,max(x))
+    subfig.set_ylim(-2,2)
+    if selector > 0:
+        selector -= 1
+    else:
+        selector = len(funcs)-1
+    subfig.plot(x,funcs[selector])
+    canvas.draw()
+
+def plot_potential(subfig,x,V):
+    global canvas
+    subfig.clear()
+    subfig.set_xlim(0,max(x))
+    subfig.set_ylim(-2,2)
+    subfig.plot(x,V)
     canvas.draw()
     
 if __name__ == "__main__":
