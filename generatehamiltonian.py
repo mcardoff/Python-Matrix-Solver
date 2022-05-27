@@ -15,7 +15,7 @@ def compute_hamiltonian(V, ISW):
             psil, psir = ISW.basis_funcs[i], ISW.basis_funcs[j]
             el = mel(psil, V, psir, ISW)
             if i == j: # diagonal elements get kinetic
-                el -= ISW.eigenvals[i]
+                el += ISW.eigenvals[i]
             row.append(el)
         hamiltonian.append(row)
 
