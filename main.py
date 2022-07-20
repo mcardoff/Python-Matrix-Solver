@@ -13,13 +13,12 @@ from matplotlib.figure import Figure
 from potentials import PotentialType
 from infinitesquarewell import InfiniteSquareWell
 from generatehamiltonian import *
-from window_events import *
 
 def solve_problem():
-        # get infinite square well basis
-    ISW = InfiniteSquareWell(energy_eigenvals=20)
+    # get infinite square well basis
+    ISW = InfiniteSquareWell(energy_eigenvals=5)
     # choose potential
-    potential = PotentialType.linear
+    potential = PotentialType.square_plus_linear
     V = potential.get_potential(ISW,100.0)
     # compute hamiltonian matrix from the potential 
     H = compute_hamiltonian(V, ISW)
@@ -35,6 +34,11 @@ def solve_problem():
 
     x = ISW.xvals
 
+    # sort by eigenval
+    zipped = zip(vals,newfuncs)
+    sorted_zip = sorted(zipped)
+    sorted_newfuncs = [func for _,func in sorted_zip]
+
     # plt.xlim(0, 1)
     # plt.ylim(-2, 2)
     # plt.plot(x,V,'black')
@@ -43,7 +47,7 @@ def solve_problem():
 
     # plt.show()
     
-    return (x,newfuncs,V)
+    return (x,sorted_newfuncs,V)
 
 def main():
     global canvas,toolbar,selector
@@ -55,10 +59,9 @@ def main():
     x,funcs,V = solve_problem()
 
     fig = Figure(figsize=(5, 4), dpi=100)
-    
     subfig = fig.add_subplot(111)
-    subfig.set_xlim(0,max(x))
-    subfig.set_ylim(-2,2)
+    
+    subfig.plot(x,funcs[0])
 
     canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
     canvas.draw()
@@ -73,16 +76,16 @@ def main():
             command=lambda: _quit(root))
     quit_button.pack(side=tkinter.LEFT)
 
-    next_button = tkinter.Button(master=root, text="Next Plot",
-            command=lambda: inc_selector(subfig,x,funcs))
-    next_button.pack(side=tkinter.LEFT)
-
     prev_button = tkinter.Button(master=root, text="Prev Plot",
             command=lambda: dec_selector(subfig,x,funcs))
     prev_button.pack(side=tkinter.LEFT)
 
+    next_button = tkinter.Button(master=root, text="Next Plot",
+            command=lambda: inc_selector(subfig,x,funcs))
+    next_button.pack(side=tkinter.LEFT)
+
     potential_button = tkinter.Button(master=root, text="Plot Potential",
-                                      command=lambda: plot_potential(subfig,x,V))
+            command=lambda: plot_potential(subfig,x,V))
     potential_button.pack(side=tkinter.LEFT)
     
     tkinter.mainloop()
@@ -92,33 +95,39 @@ def _quit(root):
     root.destroy()  # this is necessary on Windows to prevent
                     # Fatal Python Error: PyEval_RestoreThread: NULL tstate
 
+def replot(subfig,x,func,max_val):
+    global canvas
+    subfig.clear()
+    subfig.set_ylim(-max_val,max_val)
+    subfig.plot(x,func)
+    canvas.draw()
+
 def inc_selector(subfig,x,funcs):
     global canvas,selector
-    subfig.clear()
-    subfig.set_xlim(0,max(x))
-    subfig.set_ylim(-2,2)
     if selector < len(funcs)-1:
         selector += 1
     else:
         selector = 0
-    subfig.plot(x,funcs[selector])
-    canvas.draw()
+        
+    subfig.set_xlim(0,max(x))
+    max_val = max(map(max,funcs))
+    replot(subfig,x,funcs[selector],max_val)
+
 
 def dec_selector(subfig,x,funcs):
     global canvas,selector
-    subfig.clear()
-    subfig.set_xlim(0,max(x))
-    subfig.set_ylim(-2,2)
     if selector > 0:
         selector -= 1
     else:
         selector = len(funcs)-1
-    subfig.plot(x,funcs[selector])
-    canvas.draw()
+    
+    subfig.set_xlim(0,max(x))
+    max_val = max(map(max,funcs))
+    replot(subfig,x,funcs[selector])
 
 def plot_potential(subfig,x,V):
     global canvas
-    subfig.clear()
+    # subfig.clear()
     subfig.set_xlim(0,max(x))
     subfig.set_ylim(-2,2)
     subfig.plot(x,V)
