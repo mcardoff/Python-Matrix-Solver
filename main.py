@@ -54,13 +54,12 @@ def main():
     fig = Figure(figsize=(5, 4), dpi=100)
     subfig = fig.add_subplot(111)
     
-    subfig.plot(x,funcs[0])
-
     canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
     canvas.draw()
     canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
-    inc_dec = IncDecButton(subfig,canvas)
+    inc_dec = IncDecButton(subfig,canvas,x,funcs)
+    inc_dec.init_plot()
 
     toolbar = NavigationToolbar2Tk(canvas, root)
     toolbar.update()
@@ -72,15 +71,15 @@ def main():
     quit_button.pack(side=tkinter.LEFT)
 
     prev_button = tkinter.Button(master=root, text="Prev Plot",
-            command=lambda: inc_dec.dec_selector(x,funcs))
+            command=lambda: inc_dec.dec_selector())
     prev_button.pack(side=tkinter.LEFT)
 
     next_button = tkinter.Button(master=root, text="Next Plot",
-            command=lambda: inc_dec.inc_selector(x,funcs))
+            command=lambda: inc_dec.inc_selector())
     next_button.pack(side=tkinter.LEFT)
 
     potential_button = tkinter.Button(master=root, text="Plot Potential",
-            command=lambda: inc_dec.plot_potential(subfig,x,V))
+            command=lambda: inc_dec.plot_potential(V))
     potential_button.pack(side=tkinter.LEFT)
     
     tkinter.mainloop()
