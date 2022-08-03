@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from enum import Enum, auto
 from infinitesquarewell import InfiniteSquareWell
+from scipy import signal
 
 def main():
     ISW = InfiniteSquareWell()
@@ -96,7 +97,20 @@ def coupled_quadratic(ISW, amplitude):
     return general_well(ISW, cq)
 
     
-# def kronig_penney(ISW):
+def kronig_penney(ISW, amplitude):
+    def kp(x):
+        # 3 barriers -> 0.25 0.5 0.75
+        num_barriers = 2
+        spacing = 1 / (num_barriers + 1)
+        bar_wid = (1/2.0) * spacing
+        for i in range(1,num_barriers+1):
+            if i*spacing - bar_wid/2 < x and x < i*spacing + bar_wid/2:
+                ret = amplitude
+                break
+            else:
+                ret = 0.0
+        return ret
+    return general_well(ISW, kp)
     
 class PotentialType(Enum):
     square             = auto() # WORKING
@@ -107,7 +121,7 @@ class PotentialType(Enum):
     square_plus_linear = auto() # WORKING
     triangle_barrier   = auto() # WORKING
     coupled_quadratic  = auto() # WORKING
-    # kronig_penney = auto()
+    kronig_penney      = auto() # WORKING
 
     def get_potential(self, ISW, amplitude):
         assert(isinstance(ISW, InfiniteSquareWell))
@@ -127,8 +141,8 @@ class PotentialType(Enum):
             return triangle_barrier(ISW,amplitude)
         elif self is PotentialType.coupled_quadratic:
             return coupled_quadratic(ISW,amplitude)
-        # elif self is PotentialType.kronig_penney:
-        #     return kronig_penney(ISW)
+        elif self is PotentialType.kronig_penney:
+            return kronig_penney(ISW,amplitude)
 
 if __name__ == "__main__":
     main()

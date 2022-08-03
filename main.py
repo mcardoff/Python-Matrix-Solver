@@ -19,8 +19,8 @@ def solve_problem():
     # get infinite square well basis
     ISW = InfiniteSquareWell(energy_eigenvals=5)
     # choose potential
-    potential = PotentialType.coupled_quadratic
-    V = potential.get_potential(ISW,100.0)
+    potential = PotentialType.kronig_penney
+    V = potential.get_potential(ISW,100)
     # compute hamiltonian matrix from the potential 
     H = compute_hamiltonian(V, ISW)
     # diagonalize hamiltonian, getting eigenvals and eigenvecs
@@ -60,6 +60,7 @@ def main():
 
     inc_dec = IncDecButton(subfig,canvas,x,funcs)
     inc_dec.init_plot()
+    inc_dec.plot_potential(V)
 
     toolbar = NavigationToolbar2Tk(canvas, root)
     toolbar.update()
