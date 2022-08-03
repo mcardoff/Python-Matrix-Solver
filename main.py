@@ -43,42 +43,50 @@ def solve_problem():
     return (x,sorted_newfuncs,V)
 
 def main():
-    global canvas,toolbar,selector
+    global canvas
+    # solve the problem
+    # TODO Add the option to add in potential as input
+    x,funcs,V = solve_problem()
+
+    # set up tkinter
     root = tkinter.Tk()
     root.wm_title("1-D Schrodinger")
 
-    # selector = 0 # maybe make the new this a class
-
-    x,funcs,V = solve_problem()
-
+    # add matplotlib hook to tk
     fig = Figure(figsize=(5, 4), dpi=100)
     subfig = fig.add_subplot(111)
-    
+
+    # connect matplotlib hook to tk root
     canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
     canvas.draw()
     canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
+    # Helper class that has button functions
     inc_dec = IncDecButton(subfig,canvas,x,funcs)
     inc_dec.init_plot()
-    inc_dec.plot_potential(V)
 
+    # Toolbar widgets
     toolbar = NavigationToolbar2Tk(canvas, root)
     toolbar.update()
     canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
     # buttons
+    # Quit button
     quit_button = tkinter.Button(master=root, text="Quit",
             command=lambda: _quit(root))
     quit_button.pack(side=tkinter.LEFT)
 
+    # prev eigenfunction
     prev_button = tkinter.Button(master=root, text="Prev Plot",
             command=lambda: inc_dec.dec_selector())
     prev_button.pack(side=tkinter.LEFT)
 
+    # next eigenfunction
     next_button = tkinter.Button(master=root, text="Next Plot",
             command=lambda: inc_dec.inc_selector())
     next_button.pack(side=tkinter.LEFT)
 
+    # plot the potential
     potential_button = tkinter.Button(master=root, text="Plot Potential",
             command=lambda: inc_dec.plot_potential(V))
     potential_button.pack(side=tkinter.LEFT)
