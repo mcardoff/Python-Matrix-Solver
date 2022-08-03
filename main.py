@@ -13,6 +13,7 @@ from matplotlib.figure import Figure
 from potentials import PotentialType
 from infinitesquarewell import InfiniteSquareWell
 from generatehamiltonian import *
+from incdecbutton import *
 
 def solve_problem():
     # get infinite square well basis
@@ -38,14 +39,6 @@ def solve_problem():
     zipped = zip(vals,newfuncs)
     sorted_zip = sorted(zipped)
     sorted_newfuncs = [func for _,func in sorted_zip]
-
-    # plt.xlim(0, 1)
-    # plt.ylim(-2, 2)
-    # plt.plot(x,V,'black')
-    # for func in newfuncs:
-        # plt.plot(x, func)
-
-    # plt.show()
     
     return (x,sorted_newfuncs,V)
 
@@ -54,7 +47,7 @@ def main():
     root = tkinter.Tk()
     root.wm_title("1-D Schrodinger")
 
-    selector = 0
+    # selector = 0 # maybe make the new this a class
 
     x,funcs,V = solve_problem()
 
@@ -67,6 +60,8 @@ def main():
     canvas.draw()
     canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
+    inc_dec = IncDecButton(subfig,canvas)
+
     toolbar = NavigationToolbar2Tk(canvas, root)
     toolbar.update()
     canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
@@ -77,15 +72,15 @@ def main():
     quit_button.pack(side=tkinter.LEFT)
 
     prev_button = tkinter.Button(master=root, text="Prev Plot",
-            command=lambda: dec_selector(subfig,x,funcs))
+            command=lambda: inc_dec.dec_selector(x,funcs))
     prev_button.pack(side=tkinter.LEFT)
 
     next_button = tkinter.Button(master=root, text="Next Plot",
-            command=lambda: inc_selector(subfig,x,funcs))
+            command=lambda: inc_dec.inc_selector(x,funcs))
     next_button.pack(side=tkinter.LEFT)
 
     potential_button = tkinter.Button(master=root, text="Plot Potential",
-            command=lambda: plot_potential(subfig,x,V))
+            command=lambda: inc_dec.plot_potential(subfig,x,V))
     potential_button.pack(side=tkinter.LEFT)
     
     tkinter.mainloop()
@@ -95,43 +90,43 @@ def _quit(root):
     root.destroy()  # this is necessary on Windows to prevent
                     # Fatal Python Error: PyEval_RestoreThread: NULL tstate
 
-def replot(subfig,x,func,max_val):
-    global canvas
-    subfig.clear()
-    subfig.set_ylim(-max_val,max_val)
-    subfig.plot(x,func)
-    canvas.draw()
+# def replot(subfig,x,func,max_val):
+#     global canvas
+#     subfig.clear()
+#     subfig.set_ylim(-max_val,max_val)
+#     subfig.plot(x,func)
+#     canvas.draw()
 
-def inc_selector(subfig,x,funcs):
-    global canvas,selector
-    if selector < len(funcs)-1:
-        selector += 1
-    else:
-        selector = 0
+# def inc_selector(subfig,x,funcs):
+#     global canvas,selector
+#     if selector < len(funcs)-1:
+#         selector += 1
+#     else:
+#         selector = 0
         
-    subfig.set_xlim(0,max(x))
-    max_val = max(map(max,funcs))
-    replot(subfig,x,funcs[selector],max_val)
+#     subfig.set_xlim(0,max(x))
+#     max_val = max(map(max,funcs))
+#     replot(subfig,x,funcs[selector],max_val)
 
 
-def dec_selector(subfig,x,funcs):
-    global canvas,selector
-    if selector > 0:
-        selector -= 1
-    else:
-        selector = len(funcs)-1
+# def dec_selector(subfig,x,funcs):
+#     global canvas,selector
+#     if selector > 0:
+#         selector -= 1
+#     else:
+#         selector = len(funcs)-1
     
-    subfig.set_xlim(0,max(x))
-    max_val = max(map(max,funcs))
-    replot(subfig,x,funcs[selector])
+#     subfig.set_xlim(0,max(x))
+#     max_val = max(map(max,funcs))
+#     replot(subfig,x,funcs[selector])
 
-def plot_potential(subfig,x,V):
-    global canvas
-    # subfig.clear()
-    subfig.set_xlim(0,max(x))
-    subfig.set_ylim(-2,2)
-    subfig.plot(x,V)
-    canvas.draw()
+# def plot_potential(subfig,x,V):
+#     global canvas
+#     # subfig.clear()
+#     subfig.set_xlim(0,max(x))
+#     subfig.set_ylim(-2,2)
+#     subfig.plot(x,V)
+#     canvas.draw()
     
 if __name__ == "__main__":
     main()
