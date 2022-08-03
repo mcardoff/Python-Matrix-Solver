@@ -30,7 +30,8 @@ class InfiniteSquareWell:
         self.generate_basis_funcs()
 
     def generate_basis_funcs(self):
-        # know how to generate the infinite square well basis, base everything off that
+        # know how to generate the infinite square well basis,
+        # can base everything off that
 
         # Quick pneumonics
         PI = np.pi
