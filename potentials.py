@@ -65,19 +65,13 @@ def square_barrier(ISW, amplitude):
     return ret
     
 def square_plus_linear(ISW, amplitude):
-    ret = [MXVAL]
-    step = ISW.step_size
     width = ISW.well_width
-
-    for x in np.arange(step, width * 0.5, step):
-        ret.append(0.0)
-
-    for x in np.arange(width * 0.5, width-step, step):
-        ret.append(amplitude * (x - (width / 2.0)))
-
-    ret.append(MXVAL)
-
-    return ret
+    def spl(x):
+        if x < width * 0.5:
+            return 0.0
+        else:
+            return amplitude * (x - (width / 2.0))
+    return general_well(ISW, spl)
 
 def triangle_barrier(ISW, amplitude):
     width = ISW.well_width
@@ -92,33 +86,31 @@ def triangle_barrier(ISW, amplitude):
     return general_well(ISW, triangle)
     
 def coupled_quadratic(ISW, amplitude):
-    ret = [MXVAL]
-    step = ISW.step_size
     width = ISW.well_width
+    def cq(x):
+        if x < width * 0.5:
+            if (amplitude * ((x - (width / 4)) ** 2)) is None:
+                raise Exception("Bruh you dumb")
+            return amplitude * ((x - (width / 4)) ** 2)
+        else:
+            print(amplitude * ((x - (width - (width / 4))) ** 2))
+            return amplitude * ((x - (width - (width / 4))) ** 2)
 
-    for x in np.arange(step, width * 0.5, step):
-        ret.append(amplitude * ((x - (width / 4)) ** 2))
-
-    for x in np.arange(width * 0.5, width-step, step):
-        ret.append(amplitude * ((x - (width - (width / 4))) ** 2))
-
-    ret.append(MXVAL)
-
-    return ret
+    return general_well(ISW, cq)
     
 # def coupled_square_plus_field(ISW):
     
 # def kronig_penney(ISW):
     
 class PotentialType(Enum):
-    square = auto()
-    linear = auto()
-    quadratic = auto()
-    centered_quadratic = auto()
-    square_barrier = auto()
-    square_plus_linear = auto()
-    triangle_barrier = auto()
-    # coupled_quadratic = auto()
+    square             = auto() # WORKING
+    linear             = auto() # WORKING
+    quadratic          = auto() # WORKING
+    centered_quadratic = auto() # WORKING
+    square_barrier     = auto() # WORKING
+    square_plus_linear = auto() # WORKING
+    triangle_barrier   = auto() # NOT SURE 
+    coupled_quadratic  = auto() # 
     # coupled_square_plus_field = auto()
     # kronig_penney = auto()
 

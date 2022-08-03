@@ -19,7 +19,7 @@ def solve_problem():
     # get infinite square well basis
     ISW = InfiniteSquareWell(energy_eigenvals=5)
     # choose potential
-    potential = PotentialType.square_plus_linear
+    potential = PotentialType.coupled_quadratic
     V = potential.get_potential(ISW,100.0)
     # compute hamiltonian matrix from the potential 
     H = compute_hamiltonian(V, ISW)
@@ -89,43 +89,6 @@ def _quit(root):
     root.destroy()  # this is necessary on Windows to prevent
                     # Fatal Python Error: PyEval_RestoreThread: NULL tstate
 
-# def replot(subfig,x,func,max_val):
-#     global canvas
-#     subfig.clear()
-#     subfig.set_ylim(-max_val,max_val)
-#     subfig.plot(x,func)
-#     canvas.draw()
-
-# def inc_selector(subfig,x,funcs):
-#     global canvas,selector
-#     if selector < len(funcs)-1:
-#         selector += 1
-#     else:
-#         selector = 0
-        
-#     subfig.set_xlim(0,max(x))
-#     max_val = max(map(max,funcs))
-#     replot(subfig,x,funcs[selector],max_val)
-
-
-# def dec_selector(subfig,x,funcs):
-#     global canvas,selector
-#     if selector > 0:
-#         selector -= 1
-#     else:
-#         selector = len(funcs)-1
-    
-#     subfig.set_xlim(0,max(x))
-#     max_val = max(map(max,funcs))
-#     replot(subfig,x,funcs[selector])
-
-# def plot_potential(subfig,x,V):
-#     global canvas
-#     # subfig.clear()
-#     subfig.set_xlim(0,max(x))
-#     subfig.set_ylim(-2,2)
-#     subfig.plot(x,V)
-#     canvas.draw()
     
 if __name__ == "__main__":
     main()
