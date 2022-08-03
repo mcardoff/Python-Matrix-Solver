@@ -17,6 +17,7 @@ def compute_hamiltonian(V, ISW):
             if i == j: # diagonal elements get kinetic
                 el += ISW.eigenvals[i]
             row.append(el)
+            el = 0.0
         hamiltonian.append(row)
 
     return hamiltonian
