@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from enum import Enum, auto
 from infinitesquarewell import InfiniteSquareWell
-from scipy import signal
 
 def main():
     ISW = InfiniteSquareWell()
@@ -11,17 +10,15 @@ def main():
     plt.plot(ISW.xvals, V)
     plt.show()
 
-MXVAL = 10000.0
-
 def general_well(ISW,f):
+    MXVAL = 10000.0
+
     ret = [MXVAL]
 
     for x in ISW.xvals[1:len(ISW.xvals)-1]:
         ret.append(f(x))
-    # ret.append(f(x) for x in np.arange(ISW.step_size, ISW.well_width-ISW.step_size,ISW.step_size))
     
     ret.append(MXVAL)
-
     return ret
 
 def square(ISW, amplitude):
@@ -95,12 +92,11 @@ def coupled_quadratic(ISW, amplitude):
             return amplitude * ((x - (width - (width / 4))) ** 2)
 
     return general_well(ISW, cq)
-
     
 def kronig_penney(ISW, amplitude):
     def kp(x):
         # 3 barriers -> 0.25 0.5 0.75
-        num_barriers = 2
+        num_barriers = 3
         spacing = 1 / (num_barriers + 1)
         bar_wid = (1/2.0) * spacing
         for i in range(1,num_barriers+1):
