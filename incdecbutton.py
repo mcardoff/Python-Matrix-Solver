@@ -10,16 +10,17 @@ from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 
 class IncDecButton:
-    def __init__(self, subfig, canvas, x, funcs, energy_eigenvals=5):
-        self.selector = 0
-        self.energy_eigenvals = energy_eigenvals
-        self.subfig = subfig
-        self.canvas = canvas
-        self.funcs = funcs
-        self.x = x
-        self.max_val = max(map(max,map(abs,self.funcs)))+0.1
-        self.x_max = max(self.x)
+    def __init__(self, subfig, canvas, x, funcs):
+        self.selector = 0 # which one do we show
+        self.subfig = subfig # where to we put it
+        self.canvas = canvas # ditto
+        self.x = x # same x values for all the functions
+        self.funcs = funcs # library of functions
+        self.energy_eigenvals = len(funcs) # determined in main
+        self.max_val = max(map(max,map(abs,self.funcs)))+0.1 # y limits
+        self.x_max = max(self.x) # determined by well width
 
+    # plot the function func, clearing previous plot and resetting limits
     def replot(self,func):
         self.subfig.clear()
         self.subfig.set_xlim(0,self.x_max)
@@ -27,6 +28,7 @@ class IncDecButton:
         self.subfig.plot(self.x,func)
         self.canvas.draw()
 
+    # show 'previous' plot, loop to end if first
     def inc_selector(self):
         if self.selector < len(self.funcs)-1:
             self.selector += 1
@@ -35,6 +37,7 @@ class IncDecButton:
         
         self.replot(self.funcs[self.selector])
 
+    # show 'next' plot, loop to beginning at the end
     def dec_selector(self):
         if self.selector > 0:
             self.selector -= 1
@@ -43,11 +46,13 @@ class IncDecButton:
             
         self.replot(self.funcs[self.selector])
 
+    # show potential on top of current plot
     def plot_potential(self,V):
-        self.subfig.set_xlim(0,max(self.x))
-        self.subfig.set_ylim(-2,2)
-        self.subfig.plot(self.x,V)
+        self.subfig.set_xlim(0,self.max_x)
+        self.subfig.set_ylim(-self.max_val,self.max_val)
+        self.subfig.plot(self.max_x,V)
         self.canvas.draw()
 
+    # show first plot in the sequence, ignore value of selector
     def init_plot(self):
         self.replot(self.funcs[0])
