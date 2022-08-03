@@ -89,16 +89,12 @@ def coupled_quadratic(ISW, amplitude):
     width = ISW.well_width
     def cq(x):
         if x < width * 0.5:
-            if (amplitude * ((x - (width / 4)) ** 2)) is None:
-                raise Exception("Bruh you dumb")
             return amplitude * ((x - (width / 4)) ** 2)
-        else:
-            print(amplitude * ((x - (width - (width / 4))) ** 2))
+        if x >= width * 0.5:
             return amplitude * ((x - (width - (width / 4))) ** 2)
 
     return general_well(ISW, cq)
-    
-# def coupled_square_plus_field(ISW):
+
     
 # def kronig_penney(ISW):
     
@@ -109,9 +105,8 @@ class PotentialType(Enum):
     centered_quadratic = auto() # WORKING
     square_barrier     = auto() # WORKING
     square_plus_linear = auto() # WORKING
-    triangle_barrier   = auto() # NOT SURE 
-    coupled_quadratic  = auto() # 
-    # coupled_square_plus_field = auto()
+    triangle_barrier   = auto() # WORKING
+    coupled_quadratic  = auto() # WORKING
     # kronig_penney = auto()
 
     def get_potential(self, ISW, amplitude):
@@ -130,10 +125,8 @@ class PotentialType(Enum):
             return square_plus_linear(ISW,amplitude)
         elif self is PotentialType.triangle_barrier:
             return triangle_barrier(ISW,amplitude)
-        # elif self is PotentialType.coupled_quadratic:
-        #     return coupled_quadratic(ISW)
-        # elif self is PotentialType.coupled_square_plus_field:
-        #     return coupled_square_plus_field(ISW)
+        elif self is PotentialType.coupled_quadratic:
+            return coupled_quadratic(ISW,amplitude)
         # elif self is PotentialType.kronig_penney:
         #     return kronig_penney(ISW)
 
