@@ -17,7 +17,7 @@ class IncDecButton:
         self.canvas = canvas
         self.funcs = funcs
         self.x = x
-        self.max_val = max(map(max,self.funcs))
+        self.max_val = max(map(max,map(abs,self.funcs)))+0.1
         self.x_max = max(self.x)
 
     def replot(self,func):

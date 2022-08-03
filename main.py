@@ -17,7 +17,7 @@ from incdecbutton import *
 
 def solve_problem():
     # get infinite square well basis
-    ISW = InfiniteSquareWell(energy_eigenvals=5)
+    ISW = InfiniteSquareWell(energy_eigenvals=10)
     # choose potential
     potential = PotentialType.kronig_penney
     V = potential.get_potential(ISW,100)
