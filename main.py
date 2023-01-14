@@ -75,7 +75,7 @@ def main():
     quit_button = tkinter.Button(master=root, text="Quit", command=lambda: _quit(root))
 
     # Helper class that has button functions
-    inc_dec = IncDecButton(subfig,canvas,x,funcs)
+    inc_dec = IncDecButton(subfig,canvas,x,funcs,V)
     inc_dec.init_plot()
 
     # prev eigenfunction
@@ -113,7 +113,7 @@ def structure_window(potential_choice, button_obj, fig):
     fig.suptitle(potential_choice.name)
 
     # update button class
-    button_obj.update_vals(x, funcs)
+    button_obj.update_vals(x, funcs, V)
     
 
 def _quit(root):
