@@ -17,8 +17,8 @@ class IncDecButton:
         self.x = x # same x values for all the functions
         self.funcs = funcs # library of functions
         self.energy_eigenvals = len(funcs) # determined in main
-        self.max_val = max(map(max,map(abs,self.funcs)))+0.1 # y limits
-        self.x_max = max(self.x) # determined by well width
+        self.calc_max_y() 
+        self.calc_max_x() # determined by well width
 
     # plot the function func, clearing previous plot and resetting limits
     def replot(self,func):
@@ -48,11 +48,25 @@ class IncDecButton:
 
     # show potential on top of current plot
     def plot_potential(self,V):
-        self.subfig.set_xlim(0,self.max_x)
+        self.subfig.set_xlim(0,self.x_max)
         self.subfig.set_ylim(-self.max_val,self.max_val)
-        self.subfig.plot(self.max_x,V)
+        self.subfig.plot(self.x_max,V)
         self.canvas.draw()
 
     # show first plot in the sequence, ignore value of selector
     def init_plot(self):
         self.replot(self.funcs[0])
+
+    # calculate and recalculate maxes
+    def calc_max_y(self):
+        self.max_val = max(map(max,map(abs,self.funcs)))+0.1 # y limits
+
+    def calc_max_x(self):
+        self.x_max = max(self.x)
+
+    def update_vals(self, x, funcs):
+        self.x = x
+        self.funcs = funcs
+        self.calc_max_x()
+        self.calc_max_y()
+        self.init_plot()

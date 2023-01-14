@@ -52,7 +52,6 @@ def main():
     # create list items & such
     list_items = tkinter.Variable(value=[potential.name for potential in PotentialType])
     listbox = tkinter.Listbox(root, listvariable=list_items,height=3,selectmode=tkinter.BROWSE)
-    listbox.pack(side=tkinter.RIGHT)
     potential_choice = PotentialType.square
 
     # add matplotlib hook to tk
@@ -66,39 +65,37 @@ def main():
     # connect matplotlib hook to tk root
     canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
     canvas.draw()
-    canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
-
+    
     # Toolbar widgets
     toolbar = NavigationToolbar2Tk(canvas, root)
     toolbar.update()
-    canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
     # buttons
     # Quit button
-    quit_button = tkinter.Button(master=root, text="Quit",
-            command=lambda: _quit(root))
-    quit_button.pack(side=tkinter.LEFT)
+    quit_button = tkinter.Button(master=root, text="Quit", command=lambda: _quit(root))
 
     # Helper class that has button functions
     inc_dec = IncDecButton(subfig,canvas,x,funcs)
     inc_dec.init_plot()
 
     # prev eigenfunction
-    prev_button = tkinter.Button(master=root, text="Prev Plot",
-            command=lambda: inc_dec.dec_selector())
-    prev_button.pack(side=tkinter.LEFT)
+    prev_button = tkinter.Button(master=root, text="Prev Plot", command=lambda: inc_dec.dec_selector())
 
     # next eigenfunction
-    next_button = tkinter.Button(master=root, text="Next Plot",
-            command=lambda: inc_dec.inc_selector())
-    next_button.pack(side=tkinter.LEFT)
+    next_button = tkinter.Button(master=root, text="Next Plot", command=lambda: inc_dec.inc_selector())
 
     # plot the potential
-    potential_button = tkinter.Button(master=root, text="Plot Potential",
-            command=lambda: inc_dec.plot_potential(V))
-    potential_button.pack(side=tkinter.LEFT)
+    potential_button = tkinter.Button(master=root, text="Plot Potential", command=lambda: inc_dec.plot_potential(V))
 
     listbox.bind('<<ListboxSelect>>', lambda x : on_item_select(listbox, inc_dec, fig, x))
+
+    # pack buttons
+    canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
+    quit_button.pack(side=tkinter.LEFT)
+    prev_button.pack(side=tkinter.LEFT)
+    next_button.pack(side=tkinter.LEFT)
+    potential_button.pack(side=tkinter.LEFT)
+    listbox.pack(side=tkinter.RIGHT)
 
     tkinter.mainloop()
 
@@ -116,9 +113,8 @@ def structure_window(potential_choice, button_obj, fig):
     fig.suptitle(potential_choice.name)
 
     # update button class
-    button_obj.x = x
-    button_obj.funcs = funcs
-    button_obj.init_plot()
+    button_obj.update_vals(x, funcs)
+    
 
 def _quit(root):
     root.quit()     # stops mainloop
