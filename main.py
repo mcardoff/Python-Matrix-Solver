@@ -43,29 +43,30 @@ def solve_problem(potential_choice):
     return (x,sorted_newfuncs,V)
 
 def main():
-    global canvas
-    # solve the problem
-    # TODO Add the option to add in potential as input
-    potential_choice = PotentialType.square
-    x,funcs,V = solve_problem(potential_choice)
+    global canvas, root
 
     # set up tkinter
     root = tkinter.Tk()
     root.wm_title("1-D Schrodinger")
 
+    # create list items & such
+    list_items = tkinter.Variable(value=[potential.name for potential in PotentialType])
+    listbox = tkinter.Listbox(root, listvariable=list_items,height=3,selectmode=tkinter.BROWSE)
+    listbox.pack(side=tkinter.RIGHT)
+    potential_choice = PotentialType.square
+
     # add matplotlib hook to tk
     fig = Figure(figsize=(5, 4), dpi=100)
     subfig = fig.add_subplot(111)
     fig.suptitle(potential_choice.name)
+    
+    # solve the problem with initial choice
+    x,funcs,V = solve_problem(potential_choice)
 
     # connect matplotlib hook to tk root
     canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
     canvas.draw()
     canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
-
-    # Helper class that has button functions
-    inc_dec = IncDecButton(subfig,canvas,x,funcs)
-    inc_dec.init_plot()
 
     # Toolbar widgets
     toolbar = NavigationToolbar2Tk(canvas, root)
@@ -77,6 +78,10 @@ def main():
     quit_button = tkinter.Button(master=root, text="Quit",
             command=lambda: _quit(root))
     quit_button.pack(side=tkinter.LEFT)
+
+    # Helper class that has button functions
+    inc_dec = IncDecButton(subfig,canvas,x,funcs)
+    inc_dec.init_plot()
 
     # prev eigenfunction
     prev_button = tkinter.Button(master=root, text="Prev Plot",
@@ -92,14 +97,33 @@ def main():
     potential_button = tkinter.Button(master=root, text="Plot Potential",
             command=lambda: inc_dec.plot_potential(V))
     potential_button.pack(side=tkinter.LEFT)
-    
+
+    listbox.bind('<<ListboxSelect>>', lambda x : on_item_select(listbox, inc_dec, fig, x))
+
     tkinter.mainloop()
+
+def on_item_select(listbox, button_obj, fig, event):
+    pot_vals = [enum for enum in PotentialType]
+    selected_potential = pot_vals[listbox.curselection()[0]]
+    structure_window(selected_potential, button_obj, fig)
+
+def structure_window(potential_choice, button_obj, fig):
+    global canvas, root
+    # solve the problem
+    x,funcs,V = solve_problem(potential_choice)
+
+    # update figure title
+    fig.suptitle(potential_choice.name)
+
+    # update button class
+    button_obj.x = x
+    button_obj.funcs = funcs
+    button_obj.init_plot()
 
 def _quit(root):
     root.quit()     # stops mainloop
     root.destroy()  # this is necessary on Windows to prevent
                     # Fatal Python Error: PyEval_RestoreThread: NULL tstate
 
-    
 if __name__ == "__main__":
     main()
