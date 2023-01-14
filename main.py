@@ -15,11 +15,11 @@ from infinitesquarewell import InfiniteSquareWell
 from generatehamiltonian import *
 from incdecbutton import *
 
-def solve_problem():
+def solve_problem(potential_choice):
     # get infinite square well basis
     ISW = InfiniteSquareWell(energy_eigenvals=10)
     # choose potential
-    potential = PotentialType.kronig_penney
+    potential = potential_choice
     V = potential.get_potential(ISW,100)
     # compute hamiltonian matrix from the potential 
     H = compute_hamiltonian(V, ISW)
@@ -46,7 +46,8 @@ def main():
     global canvas
     # solve the problem
     # TODO Add the option to add in potential as input
-    x,funcs,V = solve_problem()
+    potential_choice = PotentialType.square
+    x,funcs,V = solve_problem(potential_choice)
 
     # set up tkinter
     root = tkinter.Tk()
@@ -55,6 +56,7 @@ def main():
     # add matplotlib hook to tk
     fig = Figure(figsize=(5, 4), dpi=100)
     subfig = fig.add_subplot(111)
+    fig.suptitle(potential_choice.name)
 
     # connect matplotlib hook to tk root
     canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
