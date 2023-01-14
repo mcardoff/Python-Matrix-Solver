@@ -45,22 +45,13 @@ def centered_quadratic(ISW, amplitude):
     return general_well(ISW, centered)
     
 def square_barrier(ISW, amplitude):
-    ret = [MXVAL]
-    step = ISW.step_size
-    width = ISW.well_width
-
-    for x in np.arange(step, width * 0.4, step):
-        ret.append(0.0)
-
-    for x in np.arange(width * 0.4, width * 0.6, step):
-        ret.append(amplitude)
-
-    for x in np.arange(width * 0.6, width, step):
-        ret.append(0.0)
-
-    ret.append(MXVAL)
-
-    return ret
+    def sqb(x):
+        width = ISW.well_width
+        if width * 0.4 < x and x < width * 0.6:
+            return amplitude
+        else:
+            return 0.0
+    return general_well(ISW, sqb)
     
 def square_plus_linear(ISW, amplitude):
     width = ISW.well_width
