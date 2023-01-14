@@ -4,7 +4,7 @@ import numpy as np
 def mel(psil, V, psir, ISW):
     """ Compute matrix element using average value theorem """
     assert(isinstance(ISW, InfiniteSquareWell))
-    el = sum(l*v*r for (l,v,r) in zip(psil,V,psir)) # discrete inner product
+    el = sum(l*v*r for (l,v,r) in zip(psil,V,psir)) # discrete inner product: < left | V | right >
     return float(ISW.well_width * el / ISW.steps) # readjust for avg val thm
 
 def compute_hamiltonian(V, ISW):
