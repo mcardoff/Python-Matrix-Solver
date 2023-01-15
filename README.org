@@ -1,0 +1,19 @@
+#+TITLE:Solving the 1-D Schrodinger Equation via Diagonalization
+#+AUTHOR:Michael Cardiff
+* The Method
+This program uses completeness of the solutions to the infinite square well problem in order to solve for any arbitrary potential in 1 dimension
+* Provided Potentials
+- Basic Square Well potential
+- Linear Potential
+- Quadratic Potential
+- Centered Quadratic to mimic harmonic oscillator potential
+- Square Barrier Potential
+- Linear Potential Turned on at x=0.5
+- Coupled Quadratic Potentials
+- Kronig-Penney Potential
+* How to Use
+Simply run
+#+begin_example
+python main.py
+#+end_example
+To see the GUI
