@@ -1,68 +1,65 @@
-# libraries
-import numpy as np
-import numpy.linalg as la
-import matplotlib.pyplot as plt
-import tkinter
+"""Create blank class to hold functions attached to buttons in main."""
 
-from matplotlib.backends.backend_tkagg import(FigureCanvasTkAgg,
-                                              NavigationToolbar2Tk)
-from matplotlib.backend_bases import key_press_handler
-from matplotlib.figure import Figure
 
 class IncDecButton:
+    """Class to track inc and dec of eigenfunctions."""
+
     def __init__(self, subfig, canvas, x, funcs, V):
-        self.selector = 0 # which one do we show
-        self.subfig = subfig # where to we put it
-        self.canvas = canvas # ditto
-        self.x = x # same x values for all the functions
-        self.funcs = funcs # library of functions
-        self.potential = V # potential 
-        self.energy_eigenvals = len(funcs) # determined in main
-        self.calc_maxes() # x and y limits
+        """Initialize necessary variables, attached to tkinter window."""
+        self.selector = 0                   # which one do we show
+        self.subfig = subfig                # where to we put it
+        self.canvas = canvas                # ditto
+        self.x = x                          # same x vals
+        self.funcs = funcs                  # library of functions
+        self.potential = V                  # potential
+        self.energy_eigenvals = len(funcs)  # set in main
+        self.calc_maxes()                   # x and y limits
 
     # plot the function func, clearing previous plot and resetting limits
-    def replot(self,func):
+    def replot(self, func):
+        """Clear the plot and plot func in its place."""
         self.subfig.clear()
-        self.subfig.set_xlim(0,self.x_max)
-        self.subfig.set_ylim(-self.max_val,self.max_val)
-        self.subfig.plot(self.x,func)
+        self.subfig.set_xlim(0, self.x_max)
+        self.subfig.set_ylim(-self.max_val, self.max_val)
+        self.subfig.plot(self.x, func)
         self.canvas.draw()
 
-    # show 'previous' plot, loop to end if first
     def inc_selector(self):
+        """Show 'next' plot, loop to beginning at the end."""
         if self.selector < len(self.funcs)-1:
             self.selector += 1
         else:
             self.selector = 0
-        
+
         self.replot(self.funcs[self.selector])
 
-    # show 'next' plot, loop to beginning at the end
     def dec_selector(self):
+        """Show 'previous' plot, loop to end if first."""
         if self.selector > 0:
             self.selector -= 1
         else:
             self.selector = len(self.funcs)-1
-            
+
         self.replot(self.funcs[self.selector])
 
-    # show potential on top of current plot
-    def plot_potential(self,V):
-        self.subfig.set_xlim(0,self.x_max)
-        self.subfig.set_ylim(-self.max_val,self.max_val)
-        self.subfig.plot(self.x,V)
+    def plot_potential(self, V):
+        """Show potential on top of current plot."""
+        self.subfig.set_xlim(0, self.x_max)
+        self.subfig.set_ylim(-self.max_val, self.max_val)
+        self.subfig.plot(self.x, V)
         self.canvas.draw()
 
-    # show first plot in the sequence, ignore value of selector
     def init_plot(self):
+        """Show first plot in the sequence, ignore value of selector."""
         self.replot(self.funcs[0])
 
-    # calculate and recalculate maxes
     def calc_maxes(self):
-        self.max_val = max(map(max,map(abs,self.funcs)))+0.1 # y limits
-        self.x_max = max(self.x) # well width determines x limit
+        """Calculate and recalculate maxes."""
+        self.max_val = max(map(max, map(abs, self.funcs)))+0.1  # y limits
+        self.x_max = max(self.x)           # well width determines x limit
 
     def update_vals(self, x, funcs, V):
+        """Set values of x, funcs, V and recalculate maxes."""
         self.x = x
         self.funcs = funcs
         self.potential = V
