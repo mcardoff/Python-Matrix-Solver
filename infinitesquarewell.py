@@ -1,16 +1,23 @@
+"""Define an infinite square well basis object for the eigenfunctions."""
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def main():
-    # tests if you can generate a ISW object, plots basis 
+    """Test if the correct basis functions are generated."""
+    # tests if you can generate a ISW object, plots basis
     ISW = InfiniteSquareWell()
     for func in ISW.basis_funcs:
         plt.plot(ISW.xvals, func)
     plt.show()
 
+
 class InfiniteSquareWell:
+    """Class which contains all important information about the ISW."""
+
     def __init__(self, well_width=1.0, steps=200,
                  energy_eigenvals=5, hbar=1.0, mass=1.0):
+        """Initialize given width, mass, number of evals and resolution."""
         # values set by user
         self.well_width = well_width
         self.steps = steps
@@ -30,17 +37,18 @@ class InfiniteSquareWell:
         self.generate_basis_funcs()
 
     def generate_basis_funcs(self):
+        """Generate eigenfunctions of zero potential well."""
         # know how to generate the infinite square well basis,
         # can base everything off that
 
         # Quick pneumonics
         PI = np.pi
         L = self.well_width
-        
+
         # all wavefunction values are in the same box
         self.xvals = np.linspace(0, L, self.steps+1)
         # ISW eigenvalues are natural numbers
-        for n in range(1,self.energy_eigenvals+1):
+        for n in range(1, self.energy_eigenvals+1):
             # analytic formulae
             energy = (n * self.hbar * PI / L) ** 2 / (2.0*self.mass)
 
@@ -51,6 +59,7 @@ class InfiniteSquareWell:
             # Add to lists
             self.eigenvals.append(energy)
             self.basis_funcs.append(eigenfunc)
+
 
 if __name__ == "__main__":
     main()
