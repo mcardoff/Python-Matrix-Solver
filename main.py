@@ -85,6 +85,7 @@ def main():
 
     # set up tkinter
     root = tkinter.Tk()
+    root.geometry("800x600")
     root.wm_title("1-D Schrodinger")
 
     # create list items & such
