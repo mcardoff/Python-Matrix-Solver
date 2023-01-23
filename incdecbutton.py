@@ -42,11 +42,11 @@ class IncDecButton:
 
         self.replot(self.funcs[self.selector])
 
-    def plot_potential(self, V):
+    def plot_potential(self):
         """Show potential on top of current plot."""
         self.subfig.set_xlim(0, self.x_max)
         self.subfig.set_ylim(-self.max_val, self.max_val)
-        self.subfig.plot(self.x, V)
+        self.subfig.plot(self.x, self.potential)
         self.canvas.draw()
 
     def init_plot(self):

@@ -15,14 +15,16 @@ def main():
 class InfiniteSquareWell:
     """Class which contains all important information about the ISW."""
 
-    def __init__(self, well_width=1.0, steps=200,
+    def __init__(self, well_min=0.0, well_max=1.0, steps=200,
                  energy_eigenvals=5, hbar=1.0, mass=1.0):
         """Initialize given width, mass, number of evals and resolution."""
         # values set by user
-        self.well_width = well_width
+        self.well_min = well_min
+        self.well_max = well_max
+        self.well_width = abs(well_max - well_min)
         self.steps = steps
         self.energy_eigenvals = energy_eigenvals
-        self.step_size = well_width / steps
+        self.step_size = self.well_width / steps
 
         # used in generation
         self.basis_funcs = []

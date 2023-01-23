@@ -113,8 +113,8 @@ def kronig_penney(ISW, amplitude):
     """Kronig-Penney Potential to model solids."""
     def kp(x):
         # 3 barriers -> 0.25 0.5 0.75
-        num_barriers = 3
-        spacing = 1 / (num_barriers + 1)
+        num_barriers = 4
+        spacing = ISW.well_width / (num_barriers + 1)
         bar_wid = (1/2.0) * spacing
         for i in range(1, num_barriers+1):
             if i*spacing - bar_wid/2 < x and x < i*spacing + bar_wid/2:
