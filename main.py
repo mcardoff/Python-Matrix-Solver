@@ -46,21 +46,35 @@ def solve_problem(text_obj, potential_choice, potential_amplitude):
     sorted_zip = sorted(zipped)
     sorted_newfuncs = [func for _, func in sorted_zip]
 
-    text_obj.insert(tkinter.END, str(np.sort(vals)))
+    _format_energy_text(text_obj, vals)
 
     return (x, sorted_newfuncs, V, vals)
 
 
-def on_item_select(listbox, button_obj, text_obj, fig, event):
+def _format_energy_text(text_obj, energy_vals):
+    # clear text currently in object
+    text_obj.delete("1.0", "end")
+
+    energy_string = ""
+    for (i, val) in enumerate(np.sort(energy_vals)):
+        num = str(i+1)
+        if i+1 < 10:
+            num = "0{}".format(i+1)
+        energy_string += "E_{} = {:.2f}\n".format(num, val)
+
+    text_obj.insert(tkinter.END, energy_string)
+
+
+def on_item_select(listbox, button_obj, e_text_obj, amp_text_obj, fig, event):
     """When an item in listbox is selected, recalculate the problem."""
     global canvas, root
 
     pot_vals = [enum for enum in PotentialType]
     potential = pot_vals[listbox.curselection()[0]]
-    potential_amp = 10.0
+    potential_amp = float(amp_text_obj.get("1.0", tkinter.END))
 
     # solve the problem
-    x, funcs, V, vals = solve_problem(text_obj, potential, potential_amp)
+    x, funcs, V, vals = solve_problem(e_text_obj, potential, potential_amp)
 
     # update figure title
     fig.suptitle(potential.name)
@@ -68,15 +82,13 @@ def on_item_select(listbox, button_obj, text_obj, fig, event):
     # update button class
     button_obj.update_vals(x, funcs, V)
 
-    # update text
-    text_obj.delete("1.0", "end")
-    text_obj.insert(tkinter.END, str(np.sort(vals)))
+    # update energy text
+    _format_energy_text(e_text_obj, vals)
 
 
 def _quit(root):
-    root.quit()     # stops mainloop
-    root.destroy()  # this is necessary on Windows to prevent
-    # Fatal Python Error: PyEval_RestoreThread: NULL tstate
+    root.quit()  # stops mainloop
+    root.destroy()
 
 
 def main():
@@ -107,10 +119,18 @@ def main():
     fig.suptitle(potential_choice.name)
 
     # Text containing energy values:
-    text = tkinter.Text(root, height=2)
+    e_text = tkinter.Text(root, height=3, width=20)
+
+    # Text field containing potential amplitude
+    label_text = tkinter.StringVar()
+    label_text.set("Potential Amp:")
+    label_dir = tkinter.Label(root, textvariable=label_text, height=2)
+
+    amp_text = tkinter.Text(root, height=1, width=10)
+    amp_text.insert(tkinter.END, str(potential_amp))
 
     # solve the problem with initial choice
-    x, funcs, V, vals = solve_problem(text, potential_choice, potential_amp)
+    x, funcs, V, vals = solve_problem(e_text, potential_choice, potential_amp)
 
     # connect matplotlib hook to tk root
     canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
@@ -144,7 +164,8 @@ def main():
         command=lambda: inc_dec.plot_potential())
 
     listbox.bind('<<ListboxSelect>>',
-                 lambda x: on_item_select(listbox, inc_dec, text, fig, x))
+                 lambda x: on_item_select(
+                     listbox, inc_dec, e_text, amp_text, fig, x))
 
     # pack buttons
     canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
@@ -153,7 +174,9 @@ def main():
     next_button.pack(side=tkinter.LEFT)
     potential_button.pack(side=tkinter.LEFT)
     listbox.pack(side=tkinter.RIGHT)
-    text.pack(side=tkinter.RIGHT)
+    e_text.pack(side=tkinter.RIGHT)
+    amp_text.pack(side=tkinter.RIGHT)
+    label_dir.pack(side=tkinter.RIGHT)
 
     tkinter.mainloop()
 
