@@ -57,9 +57,7 @@ def _format_energy_text(text_obj, energy_vals):
 
     energy_string = ""
     for (i, val) in enumerate(np.sort(energy_vals)):
-        num = str(i+1)
-        if i+1 < 10:
-            num = "0{}".format(i+1)
+        num = "0{}".format(i+1) if i+1 < 10 else str(i+1)
         energy_string += "E_{} = {:.2f}\n".format(num, val)
 
     text_obj.insert(tkinter.END, energy_string)
