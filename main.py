@@ -15,17 +15,18 @@ from infinitesquarewell import InfiniteSquareWell
 from generatehamiltonian import compute_hamiltonian
 
 
-def solve_problem(potential_choice):
+def solve_problem(text_obj, potential_choice, potential_amplitude):
     """Solve the particle in a box problem given the following.
 
-    - Potential
+    - Potential Form
+    - Potential Amplitude
     - Well Width (TODO)
     """
     # get infinite square well basis
-    ISW = InfiniteSquareWell(energy_eigenvals=10)
+    ISW = InfiniteSquareWell(energy_eigenvals=10, well_max=5.0)
     # choose potential
     potential = potential_choice
-    V = potential.get_potential(ISW, 100)
+    V = potential.get_potential(ISW, potential_amplitude)
     # compute hamiltonian matrix from the potential
     H = compute_hamiltonian(V, ISW)
     # diagonalize hamiltonian, getting eigenvals and eigenvecs
@@ -45,24 +46,31 @@ def solve_problem(potential_choice):
     sorted_zip = sorted(zipped)
     sorted_newfuncs = [func for _, func in sorted_zip]
 
-    return (x, sorted_newfuncs, V)
+    text_obj.insert(tkinter.END, str(np.sort(vals)))
+
+    return (x, sorted_newfuncs, V, vals)
 
 
-def on_item_select(listbox, button_obj, fig, event):
+def on_item_select(listbox, button_obj, text_obj, fig, event):
     """When an item in listbox is selected, recalculate the problem."""
     global canvas, root
 
     pot_vals = [enum for enum in PotentialType]
-    potential_choice = pot_vals[listbox.curselection()[0]]
+    potential = pot_vals[listbox.curselection()[0]]
+    potential_amp = 10.0
 
     # solve the problem
-    x, funcs, V = solve_problem(potential_choice)
+    x, funcs, V, vals = solve_problem(text_obj, potential, potential_amp)
 
     # update figure title
-    fig.suptitle(potential_choice.name)
+    fig.suptitle(potential.name)
 
     # update button class
     button_obj.update_vals(x, funcs, V)
+
+    # update text
+    text_obj.delete("1.0", "end")
+    text_obj.insert(tkinter.END, str(np.sort(vals)))
 
 
 def _quit(root):
@@ -90,14 +98,18 @@ def main():
 
     # Default choice is square well upon start
     potential_choice = PotentialType.square
+    potential_amp = 0.0
 
     # add matplotlib hook to tk
     fig = Figure(figsize=(5, 4), dpi=100)
     subfig = fig.add_subplot(111)
     fig.suptitle(potential_choice.name)
 
+    # Text containing energy values:
+    text = tkinter.Text(root, height=2)
+
     # solve the problem with initial choice
-    x, funcs, V = solve_problem(potential_choice)
+    x, funcs, V, vals = solve_problem(text, potential_choice, potential_amp)
 
     # connect matplotlib hook to tk root
     canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
@@ -128,10 +140,10 @@ def main():
     potential_button = tkinter.Button(
         master=root,
         text="Plot Potential",
-        command=lambda: inc_dec.plot_potential(V))
+        command=lambda: inc_dec.plot_potential())
 
     listbox.bind('<<ListboxSelect>>',
-                 lambda x: on_item_select(listbox, inc_dec, fig, x))
+                 lambda x: on_item_select(listbox, inc_dec, text, fig, x))
 
     # pack buttons
     canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
@@ -140,6 +152,7 @@ def main():
     next_button.pack(side=tkinter.LEFT)
     potential_button.pack(side=tkinter.LEFT)
     listbox.pack(side=tkinter.RIGHT)
+    text.pack(side=tkinter.RIGHT)
 
     tkinter.mainloop()
 
