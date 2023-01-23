@@ -51,51 +51,13 @@ def solve_problem(text_obj, potential_choice, potential_amplitude):
     return (x, sorted_newfuncs, V, vals)
 
 
-def _format_energy_text(text_obj, energy_vals):
-    # clear text currently in object
-    text_obj.delete("1.0", "end")
-
-    energy_string = ""
-    for (i, val) in enumerate(np.sort(energy_vals)):
-        num = "0{}".format(i+1) if i+1 < 10 else str(i+1)
-        energy_string += "E_{} = {:.2f}\n".format(num, val)
-
-    text_obj.insert(tkinter.END, energy_string)
-
-
-def on_item_select(listbox, button_obj, e_text_obj, amp_text_obj, fig, event):
-    """When an item in listbox is selected, recalculate the problem."""
-    global canvas, root
-
-    pot_vals = [enum for enum in PotentialType]
-    potential = pot_vals[listbox.curselection()[0]]
-    potential_amp = float(amp_text_obj.get("1.0", tkinter.END))
-
-    # solve the problem
-    x, funcs, V, vals = solve_problem(e_text_obj, potential, potential_amp)
-
-    # update figure title
-    fig.suptitle(potential.name)
-
-    # update button class
-    button_obj.update_vals(x, funcs, V)
-
-    # update energy text
-    _format_energy_text(e_text_obj, vals)
-
-
-def _quit(root):
-    root.quit()  # stops mainloop
-    root.destroy()
-
-
 def main():
     """Run the main loop of the program, handle events, etc."""
     global canvas, root
 
     # set up tkinter
     root = tkinter.Tk()
-    root.geometry("800x600")
+    root.geometry("1000x600")
     root.wm_title("1-D Schrodinger")
 
     # create list items & such
@@ -120,12 +82,14 @@ def main():
     e_text = tkinter.Text(root, height=3, width=20)
 
     # Text field containing potential amplitude
-    label_text = tkinter.StringVar()
-    label_text.set("Potential Amp:")
-    label_dir = tkinter.Label(root, textvariable=label_text, height=2)
+    amp_label_text = tkinter.StringVar()
+    amp_label_text.set("Potential Amp:")
+    amp_label = tkinter.Label(root, textvariable=amp_label_text, height=2)
 
-    amp_text = tkinter.Text(root, height=1, width=10)
-    amp_text.insert(tkinter.END, str(potential_amp))
+    amp_text = tkinter.Entry(root)
+    amp_text.insert(tkinter.END, "0")
+    reg = root.register(_validate_number)
+    amp_text.config(validate="key", validatecommand=(reg, '%P'))
 
     # solve the problem with initial choice
     x, funcs, V, vals = solve_problem(e_text, potential_choice, potential_amp)
@@ -162,21 +126,78 @@ def main():
         command=lambda: inc_dec.plot_potential())
 
     listbox.bind('<<ListboxSelect>>',
-                 lambda x: on_item_select(
+                 lambda x: _on_item_select(
                      listbox, inc_dec, e_text, amp_text, fig, x))
 
+    # labels
+    en_label_text = tkinter.StringVar()
+    pot_label_text = tkinter.StringVar()
+    en_label_text.set("Energy Values:")
+    pot_label_text.set("1-D Potential:")
+    energy_label = tkinter.Label(root, textvariable=en_label_text, height=2)
+    potential_label = tkinter.Label(root, textvariable=pot_label_text, height=2)
+
     # pack buttons
-    canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
-    quit_button.pack(side=tkinter.LEFT)
-    prev_button.pack(side=tkinter.LEFT)
-    next_button.pack(side=tkinter.LEFT)
-    potential_button.pack(side=tkinter.LEFT)
-    listbox.pack(side=tkinter.RIGHT)
-    e_text.pack(side=tkinter.RIGHT)
-    amp_text.pack(side=tkinter.RIGHT)
-    label_dir.pack(side=tkinter.RIGHT)
+    canvas.get_tk_widget().pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
+    prev_button.pack(side=tkinter.TOP)
+    next_button.pack(side=tkinter.TOP)
+    quit_button.pack(side=tkinter.BOTTOM)
+    potential_button.pack(side=tkinter.TOP)
+    potential_label.pack(side=tkinter.TOP)
+    listbox.pack(side=tkinter.TOP)
+    amp_label.pack(side=tkinter.TOP)
+    amp_text.pack(side=tkinter.TOP)
+    energy_label.pack(side=tkinter.TOP)
+    e_text.pack(side=tkinter.TOP)
 
     tkinter.mainloop()
+
+
+def _format_energy_text(text_obj, energy_vals):
+    # clear text currently in object
+    text_obj.delete("1.0", "end")
+
+    energy_string = ""
+    for (i, val) in enumerate(np.sort(energy_vals)):
+        num = "0{}".format(i+1) if i+1 < 10 else str(i+1)
+        energy_string += "E_{} = {:.2f}\n".format(num, val)
+
+    text_obj.insert(tkinter.END, energy_string)
+
+
+def _validate_number(test):
+    if test.isdigit():
+        return True
+    elif test == "":
+        return True
+    else:
+        return False
+
+
+def _on_item_select(listbox, button_obj, e_text_obj, amp_text_obj, fig, event):
+    """When an item in listbox is selected, recalculate the problem."""
+    global canvas, root
+
+    pot_vals = [enum for enum in PotentialType]
+    potential = pot_vals[listbox.curselection()[0]]
+    potential_amp = float(amp_text_obj.get())
+
+    # solve the problem
+    x, funcs, V, vals = solve_problem(e_text_obj, potential, potential_amp)
+
+    # update figure title
+    fig.suptitle(potential.name)
+
+    # update button class
+    button_obj.update_vals(x, funcs, V)
+
+    # update energy text
+    _format_energy_text(e_text_obj, vals)
+
+
+def _quit(root):
+    root.quit()  # stops mainloop
+    root.destroy()
 
 
 if __name__ == "__main__":
