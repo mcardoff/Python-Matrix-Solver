@@ -135,7 +135,7 @@ def main():
     en_label_text.set("Energy Values:")
     pot_label_text.set("1-D Potential:")
     energy_label = tkinter.Label(root, textvariable=en_label_text, height=2)
-    potential_label = tkinter.Label(root, textvariable=pot_label_text, height=2)
+    pot_label = tkinter.Label(root, textvariable=pot_label_text, height=2)
 
     # pack buttons
     canvas.get_tk_widget().pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
@@ -143,7 +143,7 @@ def main():
     next_button.pack(side=tkinter.TOP)
     quit_button.pack(side=tkinter.BOTTOM)
     potential_button.pack(side=tkinter.TOP)
-    potential_label.pack(side=tkinter.TOP)
+    pot_label.pack(side=tkinter.TOP)
     listbox.pack(side=tkinter.TOP)
     amp_label.pack(side=tkinter.TOP)
     amp_text.pack(side=tkinter.TOP)
