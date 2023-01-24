@@ -154,7 +154,7 @@ def main():
 
 
 def _format_energy_text(text_obj, energy_vals):
-    # clear text currently in object
+    """Clear text currently in text_obj, replace with energy_vals."""
     text_obj.delete("1.0", "end")
 
     energy_string = ""
@@ -166,7 +166,8 @@ def _format_energy_text(text_obj, energy_vals):
 
 
 def _validate_number(test):
-    if test.isdigit():
+    """Validate whether or not test is a valid numerical input."""
+    if test.replace(".", "", 1).isdigit(): # ensure one decimal point
         return True
     elif test == "":
         return True
@@ -176,7 +177,7 @@ def _validate_number(test):
 
 def _on_item_select(listbox, button_obj, e_text_obj, amp_text_obj, fig, event):
     """When an item in listbox is selected, recalculate the problem."""
-    global canvas, root
+    # global canvas, root
 
     pot_vals = [enum for enum in PotentialType]
     potential = pot_vals[listbox.curselection()[0]]
