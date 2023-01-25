@@ -56,7 +56,7 @@ class InfiniteSquareWell:
 
             eigenfunc = []
             for x in self.xvals:
-                eigenfunc.append(np.sqrt(2/L)*np.sin(n*PI*(x-L/2)/L))
+                eigenfunc.append(np.sqrt(2/L)*np.sin(n*PI*(x-self.well_min)/L))
 
             # Add to lists
             self.eigenvals.append(energy)
