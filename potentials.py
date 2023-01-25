@@ -20,6 +20,7 @@ def general_well(ISW, f):
     ret = [MXVAL]
 
     for x in ISW.xvals[1:len(ISW.xvals)-1]:
+        # print('x: {}, f(x): {}'.format(x, f(x)))
         ret.append(f(x))
 
     ret.append(MXVAL)
@@ -49,9 +50,10 @@ def centered_quadratic(ISW, amplitude):
     assert(isinstance(ISW, InfiniteSquareWell))
 
     def centered(x):
-        mid = ISW.well_width / 2.0
-        if x > 0.5 * mid and x < 1.5 * mid:
-            offset = x - mid
+        width = ISW.well_width
+        mid = (ISW.well_max - abs(ISW.well_min)) / 2.0
+        offset = x - mid
+        if abs(offset) < 0.25 * width:
             return amplitude * offset * offset
         else:
             return 0
@@ -62,7 +64,9 @@ def square_barrier(ISW, amplitude):
     """Square-shaped potential barrier."""
     def sqb(x):
         width = ISW.well_width
-        if width * 0.4 < x and x < width * 0.6:
+        mid = (ISW.well_max - abs(ISW.well_min)) / 2.0
+        offset = x - mid
+        if abs(offset) < 0.2 * 0.5 * width:
             return amplitude
         else:
             return 0.0
@@ -71,25 +75,26 @@ def square_barrier(ISW, amplitude):
 
 def square_plus_linear(ISW, amplitude):
     """Flat Potential that turns linear after a bit."""
-    width = ISW.well_width
-
     def spl(x):
-        if x < width * 0.5:
+        mid = (ISW.well_max - abs(ISW.well_min)) / 2.0
+        offset = x - mid
+        if x < mid:
             return 0.0
         else:
-            return amplitude * (x - (width / 2.0))
+            return amplitude * (offset)
     return general_well(ISW, spl)
 
 
 def triangle_barrier(ISW, amplitude):
     """Triangle-Shaped Potential barrier."""
-    width = ISW.well_width
-
     def triangle(x):
-        if ((0.4*width < x) and (x < width / 2.0)):
-            return amplitude * (x - 0.4*width)
-        elif (x >= width / 2.0 and x <= 0.6*width):
-            return -amplitude * (x - 0.6*width)
+        width = ISW.well_width
+        mid = (ISW.well_max - abs(ISW.well_min)) / 2.0
+        offset = x - mid
+        if -0.25*width < offset and offset < 0:
+            return -amplitude * abs(x)
+        elif 0 < offset and offset < 0.25*width:
+            return -amplitude * abs(x)
         else:
             return 0.0
 
