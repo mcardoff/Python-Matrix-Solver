@@ -48,7 +48,7 @@ class InfiniteSquareWell:
         L = self.well_width
 
         # all wavefunction values are in the same box
-        self.xvals = np.linspace(0, L, self.steps+1)
+        self.xvals = np.linspace(self.well_min, self.well_max, self.steps+1)
         # ISW eigenvalues are natural numbers
         for n in range(1, self.energy_eigenvals+1):
             # analytic formulae
@@ -56,7 +56,7 @@ class InfiniteSquareWell:
 
             eigenfunc = []
             for x in self.xvals:
-                eigenfunc.append(np.sqrt(2/L)*np.sin(n*PI*x/L))
+                eigenfunc.append(np.sqrt(2/L)*np.sin(n*PI*(x-L/2)/L))
 
             # Add to lists
             self.eigenvals.append(energy)

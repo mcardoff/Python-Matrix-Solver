@@ -13,13 +13,13 @@ class IncDecButton:
         self.funcs = funcs                  # library of functions
         self.potential = V                  # potential
         self.energy_eigenvals = len(funcs)  # set in main
-        self.calc_maxes()                   # x and y limits
+        self.calc_extrema()                 # x and y limits
 
     # plot the function func, clearing previous plot and resetting limits
     def replot(self, func):
         """Clear the plot and plot func in its place."""
         self.subfig.clear()
-        self.subfig.set_xlim(0, self.x_max)
+        self.subfig.set_xlim(self.x_min, self.x_max)
         self.subfig.set_ylim(-self.max_val, self.max_val)
         self.subfig.plot(self.x, func)
         self.canvas.draw()
@@ -44,7 +44,7 @@ class IncDecButton:
 
     def plot_potential(self):
         """Show potential on top of current plot."""
-        self.subfig.set_xlim(0, self.x_max)
+        self.subfig.set_xlim(self.x_min, self.x_max)
         self.subfig.set_ylim(-self.max_val, self.max_val)
         self.subfig.plot(self.x, self.potential)
         self.canvas.draw()
@@ -53,15 +53,16 @@ class IncDecButton:
         """Show first plot in the sequence, ignore value of selector."""
         self.replot(self.funcs[0])
 
-    def calc_maxes(self):
+    def calc_extrema(self):
         """Calculate and recalculate maxes."""
         self.max_val = max(map(max, map(abs, self.funcs)))+0.1  # y limits
-        self.x_max = max(self.x)           # well width determines x limit
+        self.x_max = max(self.x)                       # Determined in ISW
+        self.x_min = min(self.x)                       # Determined in ISW
 
     def update_vals(self, x, funcs, V):
         """Set values of x, funcs, V and recalculate maxes."""
         self.x = x
         self.funcs = funcs
         self.potential = V
-        self.calc_maxes()
+        self.calc_extrema()
         self.init_plot()
