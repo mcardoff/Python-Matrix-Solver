@@ -76,9 +76,9 @@ def square_barrier(ISW, amplitude):
 def square_plus_linear(ISW, amplitude):
     """Flat Potential that turns linear after a bit."""
     def spl(x):
-        mid = (ISW.well_max - abs(ISW.well_min)) / 2.0
+        mid = (ISW.well_max + ISW.well_min) / 2.0
         offset = x - mid
-        if x < mid:
+        if offset < 0:
             return 0.0
         else:
             return amplitude * (offset)
@@ -89,28 +89,25 @@ def triangle_barrier(ISW, amplitude):
     """Triangle-Shaped Potential barrier."""
     def triangle(x):
         width = ISW.well_width
-        mid = (ISW.well_max - abs(ISW.well_min)) / 2.0
+        mid = (ISW.well_max + ISW.well_min) / 2.0
         offset = x - mid
-        if -0.25*width < offset and offset < 0:
-            return -amplitude * abs(x)
-        elif 0 < offset and offset < 0.25*width:
-            return -amplitude * abs(x)
+        if abs(offset) < 0.25*width:
+            return -amplitude*(abs(offset) - 0.25*width)
         else:
             return 0.0
-
     return general_well(ISW, triangle)
 
 
 def coupled_quadratic(ISW, amplitude):
     """Multiple quadratic potentials next to each other."""
-    width = ISW.well_width
-
     def cq(x):
-        if x < width * 0.5:
-            return amplitude * ((x - (width / 4)) ** 2)
-        if x >= width * 0.5:
-            return amplitude * ((x - (width - (width / 4))) ** 2)
-
+        width = ISW.well_width
+        mid = (ISW.well_max + ISW.well_min) / 2.0
+        offset = x - mid
+        if abs(offset) < 0.25 * width:
+            return amplitude * (abs(offset) - 0.125*width) ** 2
+        else:
+            return 0.0
     return general_well(ISW, cq)
 
 
@@ -118,16 +115,18 @@ def kronig_penney(ISW, amplitude):
     """Kronig-Penney Potential to model solids."""
     def kp(x):
         # 3 barriers -> 0.25 0.5 0.75
-        num_barriers = 4
+        offset = x - ISW.well_min
+        num_barriers = 5
         spacing = ISW.well_width / (num_barriers + 1)
-        bar_wid = (1/2.0) * spacing
+        bar_wid = 2 / ((num_barriers + 1))
+        # n bars of wid d equally spaced between min and max
+        # positions of bars determined by width / (num_barriers+1)
+        # if (x - left_lim) = w / (n+1), delta site
         for i in range(1, num_barriers+1):
-            if i*spacing - bar_wid/2 < x and x < i*spacing + bar_wid/2:
-                ret = amplitude
-                break
-            else:
-                ret = 0.0
-        return ret
+            if i*spacing - bar_wid < offset and offset < i*spacing + bar_wid:
+                return amplitude
+        else:
+            return 0
     return general_well(ISW, kp)
 
 
