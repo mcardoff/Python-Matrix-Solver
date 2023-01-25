@@ -20,7 +20,7 @@ def compute_hamiltonian(V, ISW):
         for j in range(ISW.energy_eigenvals):
             psil, psir = ISW.basis_funcs[i], ISW.basis_funcs[j]
             el = mel(psil, V, psir, ISW)
-            if i == j:  # diagonal elements get kinetic
+            if i == j:  # diagonal elements get kinetic term
                 el += ISW.eigenvals[i]
             row.append(el)
             el = 0.0
