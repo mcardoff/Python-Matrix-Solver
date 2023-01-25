@@ -15,25 +15,28 @@ from infinitesquarewell import InfiniteSquareWell
 from generatehamiltonian import compute_hamiltonian
 
 
-def solve_problem(text_obj,
-                  potential_choice, potential_amplitude,
-                  l_bnd=-5.0, r_bnd=5.0):
+def solve_problem(text_obj, potential_choice, potential_amplitude,
+                  e_vals=10, l_bnd=-5.0, r_bnd=5.0):
     """Solve the particle in a box problem given the following.
 
     - Potential Form
     - Potential Amplitude
-    - Well Width (TODO)
+    - Well Width
+    - (TODO) Number of e-vals
     """
     # get infinite square well basis
-    ISW = InfiniteSquareWell(energy_eigenvals=10,
+    ISW = InfiniteSquareWell(energy_eigenvals=e_vals,
                              well_min=l_bnd, well_max=r_bnd)
     # choose potential
     potential = potential_choice
     V = potential.get_potential(ISW, potential_amplitude)
+
     # compute hamiltonian matrix from the potential
     H = compute_hamiltonian(V, ISW)
+
     # diagonalize hamiltonian, getting eigenvals and eigenvecs
     vals, vecs = la.eig(H)
+
     # new functions are the eigenvectors time the eigenfunctions of ISW
     newfuncs = []
     for col in np.transpose(vecs):
@@ -71,6 +74,7 @@ def main():
         listvariable=list_items,
         height=3,
         selectmode=tkinter.BROWSE)
+    listbox.selection_set(first=0)  # set first selection by default
 
     # Default choice is square well upon start
     potential_choice = PotentialType.square
@@ -84,6 +88,10 @@ def main():
     # Text containing energy values:
     e_text = tkinter.Text(root, height=3, width=20)
 
+    # validaters for float and int
+    reg_f = root.register(_validate_float)
+    reg_i = root.register(_validate_int)
+
     # Text field containing potential amplitude
     amp_label_text = tkinter.StringVar()
     amp_label_text.set("Potential Amp:")
@@ -91,8 +99,7 @@ def main():
 
     amp_text = tkinter.Entry(root)
     amp_text.insert(tkinter.END, "0")
-    reg = root.register(_validate_number)
-    amp_text.config(validate="key", validatecommand=(reg, '%P'))
+    amp_text.config(validate="key", validatecommand=(reg_f, '%P'))
 
     # solve the problem with initial choice
     x, funcs, V, vals = solve_problem(e_text, potential_choice, potential_amp)
@@ -131,36 +138,44 @@ def main():
     # change well minimum and maximum
     min_entry = tkinter.Entry(root)
     min_entry.insert(tkinter.END, str(min(x)))
-    min_entry.config(validate="key", validatecommand=(reg, '%P'))
+    min_entry.config(validate="key", validatecommand=(reg_f, '%P'))
 
     max_entry = tkinter.Entry(root)
     max_entry.insert(tkinter.END, str(max(x)))
-    max_entry.config(validate="key", validatecommand=(reg, '%P'))
+    max_entry.config(validate="key", validatecommand=(reg_f, '%P'))
+
+    # change dimension of Hamiltonian
+    eig_entry = tkinter.Entry(root)
+    eig_entry.insert(tkinter.END, "10")
+    eig_entry.config(validate="key", validatecommand=(reg_i, '%P'))
 
     # listbox to pick potential
     listbox.bind('<<ListboxSelect>>',
                  lambda x: _on_item_select(
                      listbox, inc_dec, e_text, amp_text,
-                     fig, min_entry, max_entry, x))
+                     fig, min_entry, max_entry, eig_entry, x))
 
     # labels
     eng_label_text = tkinter.StringVar(value="Energy Values:")
     pot_label_text = tkinter.StringVar(value="1-D Potential:")
     min_label_text = tkinter.StringVar(value="Well Min:")
     max_label_text = tkinter.StringVar(value="Well Max:")
+    eig_label_text = tkinter.StringVar(value="Energy Eigenvals:")
     energy_label = tkinter.Label(root, textvariable=eng_label_text, height=2)
     pot_label = tkinter.Label(root, textvariable=pot_label_text, height=2)
     min_label = tkinter.Label(root, textvariable=min_label_text, height=2)
     max_label = tkinter.Label(root, textvariable=max_label_text, height=2)
+    eig_label = tkinter.Label(root, textvariable=eig_label_text, height=2)
 
     # pack buttons
     canvas.get_tk_widget().pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
     prev_button.pack(side=tkinter.TOP)
     next_button.pack(side=tkinter.TOP)
-    quit_button.pack(side=tkinter.BOTTOM)
     potential_button.pack(side=tkinter.TOP)
     pot_label.pack(side=tkinter.TOP)
     listbox.pack(side=tkinter.TOP)
+    eig_label.pack(side=tkinter.TOP)
+    eig_entry.pack(side=tkinter.TOP)
     amp_label.pack(side=tkinter.TOP)
     amp_text.pack(side=tkinter.TOP)
     min_label.pack(side=tkinter.TOP)
@@ -169,6 +184,7 @@ def main():
     max_entry.pack(side=tkinter.TOP)
     energy_label.pack(side=tkinter.TOP)
     e_text.pack(side=tkinter.TOP)
+    quit_button.pack(side=tkinter.BOTTOM)
 
     tkinter.mainloop()
 
@@ -185,8 +201,8 @@ def _format_energy_text(text_obj, energy_vals):
     text_obj.insert(tkinter.END, energy_string)
 
 
-def _validate_number(test):
-    """Validate whether or not test is a valid numerical input."""
+def _validate_float(test):
+    """Validate whether or not test is a valid floating number input."""
     # Ensure only one minus sign and decimal point
     replace_chars = ['.', '-']
     for char in replace_chars:
@@ -195,8 +211,14 @@ def _validate_number(test):
     return (test.isdigit() or test == "")
 
 
+def _validate_int(test):
+    """Validate whether or not test is a valid integer input."""
+    # isdigit is siffucient
+    return (test.isdigit() or test == "")
+
+
 def _on_item_select(list_box, button_obj, e_text_obj, amp_text_obj,
-                    fig, min_text_obj, max_text_obj, event):
+                    fig, min_text_obj, max_text_obj, e_val_obj, event):
     """When an item in list_box is selected, recalculate the problem."""
     # global canvas, root
 
@@ -204,11 +226,12 @@ def _on_item_select(list_box, button_obj, e_text_obj, amp_text_obj,
     potential_amp = float(amp_text_obj.get())
     well_min = float(min_text_obj.get())
     well_max = float(max_text_obj.get())
+    e_vals = int(e_val_obj.get())
 
-    # solve the problem
+    # solve the problem... again
     x, funcs, V, vals = solve_problem(
         e_text_obj, potential, potential_amp,
-        l_bnd=well_min, r_bnd=well_max)
+        e_vals=e_vals, l_bnd=well_min, r_bnd=well_max)
 
     # update figure title
     fig.suptitle(potential.name)
