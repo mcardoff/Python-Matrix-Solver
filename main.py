@@ -23,7 +23,7 @@ def solve_problem(text_obj, potential_choice, potential_amplitude):
     - Well Width (TODO)
     """
     # get infinite square well basis
-    ISW = InfiniteSquareWell(energy_eigenvals=10, well_max=5.0)
+    ISW = InfiniteSquareWell(energy_eigenvals=10, well_min=-5.0, well_max=5.0)
     # choose potential
     potential = potential_choice
     V = potential.get_potential(ISW, potential_amplitude)
@@ -129,13 +129,28 @@ def main():
                  lambda x: _on_item_select(
                      listbox, inc_dec, e_text, amp_text, fig, x))
 
+    # change well minimum and maximum
+    min_entry = tkinter.Entry(root)
+    min_entry.insert(tkinter.END, str(min(x)))
+    min_entry.config(validate="key", validatecommand=(reg, '%P'))
+
+    max_entry = tkinter.Entry(root)
+    max_entry.insert(tkinter.END, str(max(x)))
+    max_entry.config(validate="key", validatecommand=(reg, '%P'))
+
     # labels
     en_label_text = tkinter.StringVar()
     pot_label_text = tkinter.StringVar()
+    min_label_text = tkinter.StringVar()
+    max_label_text = tkinter.StringVar()
     en_label_text.set("Energy Values:")
     pot_label_text.set("1-D Potential:")
+    min_label_text.set("Well Min:")
+    max_label_text.set("Well Max:")
     energy_label = tkinter.Label(root, textvariable=en_label_text, height=2)
     pot_label = tkinter.Label(root, textvariable=pot_label_text, height=2)
+    min_label = tkinter.Label(root, textvariable=min_label_text, height=2)
+    max_label = tkinter.Label(root, textvariable=max_label_text, height=2)
 
     # pack buttons
     canvas.get_tk_widget().pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
@@ -147,6 +162,10 @@ def main():
     listbox.pack(side=tkinter.TOP)
     amp_label.pack(side=tkinter.TOP)
     amp_text.pack(side=tkinter.TOP)
+    min_label.pack(side=tkinter.TOP)
+    min_entry.pack(side=tkinter.TOP)
+    max_label.pack(side=tkinter.TOP)
+    max_entry.pack(side=tkinter.TOP)
     energy_label.pack(side=tkinter.TOP)
     e_text.pack(side=tkinter.TOP)
 
@@ -167,12 +186,12 @@ def _format_energy_text(text_obj, energy_vals):
 
 def _validate_number(test):
     """Validate whether or not test is a valid numerical input."""
-    if test.replace(".", "", 1).isdigit(): # ensure one decimal point
-        return True
-    elif test == "":
-        return True
-    else:
-        return False
+    # Ensure only one minus sign and decimal point
+    replace_chars = ['.', '-']
+    for char in replace_chars:
+        test = test.replace(char, "", 1)
+
+    return (test.isdigit() or test == "")
 
 
 def _on_item_select(listbox, button_obj, e_text_obj, amp_text_obj, fig, event):
