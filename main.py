@@ -15,7 +15,9 @@ from infinitesquarewell import InfiniteSquareWell
 from generatehamiltonian import compute_hamiltonian
 
 
-def solve_problem(text_obj, potential_choice, potential_amplitude):
+def solve_problem(text_obj,
+                  potential_choice, potential_amplitude,
+                  l_bnd=-5.0, r_bnd=5.0):
     """Solve the particle in a box problem given the following.
 
     - Potential Form
@@ -23,7 +25,8 @@ def solve_problem(text_obj, potential_choice, potential_amplitude):
     - Well Width (TODO)
     """
     # get infinite square well basis
-    ISW = InfiniteSquareWell(energy_eigenvals=10, well_min=-5.0, well_max=5.0)
+    ISW = InfiniteSquareWell(energy_eigenvals=10,
+                             well_min=l_bnd, well_max=r_bnd)
     # choose potential
     potential = potential_choice
     V = potential.get_potential(ISW, potential_amplitude)
@@ -125,10 +128,6 @@ def main():
         text="Plot Potential",
         command=lambda: inc_dec.plot_potential())
 
-    listbox.bind('<<ListboxSelect>>',
-                 lambda x: _on_item_select(
-                     listbox, inc_dec, e_text, amp_text, fig, x))
-
     # change well minimum and maximum
     min_entry = tkinter.Entry(root)
     min_entry.insert(tkinter.END, str(min(x)))
@@ -138,16 +137,18 @@ def main():
     max_entry.insert(tkinter.END, str(max(x)))
     max_entry.config(validate="key", validatecommand=(reg, '%P'))
 
+    # listbox to pick potential
+    listbox.bind('<<ListboxSelect>>',
+                 lambda x: _on_item_select(
+                     listbox, inc_dec, e_text, amp_text,
+                     fig, min_entry, max_entry, x))
+
     # labels
-    en_label_text = tkinter.StringVar()
-    pot_label_text = tkinter.StringVar()
-    min_label_text = tkinter.StringVar()
-    max_label_text = tkinter.StringVar()
-    en_label_text.set("Energy Values:")
-    pot_label_text.set("1-D Potential:")
-    min_label_text.set("Well Min:")
-    max_label_text.set("Well Max:")
-    energy_label = tkinter.Label(root, textvariable=en_label_text, height=2)
+    eng_label_text = tkinter.StringVar(value="Energy Values:")
+    pot_label_text = tkinter.StringVar(value="1-D Potential:")
+    min_label_text = tkinter.StringVar(value="Well Min:")
+    max_label_text = tkinter.StringVar(value="Well Max:")
+    energy_label = tkinter.Label(root, textvariable=eng_label_text, height=2)
     pot_label = tkinter.Label(root, textvariable=pot_label_text, height=2)
     min_label = tkinter.Label(root, textvariable=min_label_text, height=2)
     max_label = tkinter.Label(root, textvariable=max_label_text, height=2)
@@ -194,16 +195,20 @@ def _validate_number(test):
     return (test.isdigit() or test == "")
 
 
-def _on_item_select(listbox, button_obj, e_text_obj, amp_text_obj, fig, event):
-    """When an item in listbox is selected, recalculate the problem."""
+def _on_item_select(list_box, button_obj, e_text_obj, amp_text_obj,
+                    fig, min_text_obj, max_text_obj, event):
+    """When an item in list_box is selected, recalculate the problem."""
     # global canvas, root
 
-    pot_vals = [enum for enum in PotentialType]
-    potential = pot_vals[listbox.curselection()[0]]
+    potential = [enum for enum in PotentialType][list_box.curselection()[0]]
     potential_amp = float(amp_text_obj.get())
+    well_min = float(min_text_obj.get())
+    well_max = float(max_text_obj.get())
 
     # solve the problem
-    x, funcs, V, vals = solve_problem(e_text_obj, potential, potential_amp)
+    x, funcs, V, vals = solve_problem(
+        e_text_obj, potential, potential_amp,
+        l_bnd=well_min, r_bnd=well_max)
 
     # update figure title
     fig.suptitle(potential.name)
