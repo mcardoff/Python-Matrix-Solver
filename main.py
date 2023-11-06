@@ -73,6 +73,7 @@ def main():
         root,
         listvariable=list_items,
         height=3,
+        exportselection=False,
         selectmode=tkinter.BROWSE)
     listbox.selection_set(first=0)  # set first selection by default
 
@@ -83,7 +84,7 @@ def main():
     # add matplotlib hook to tk
     fig = Figure(figsize=(5, 4), dpi=100)
     subfig = fig.add_subplot(111)
-    fig.suptitle(potential_choice.name)
+    fig.suptitle(potential_choice.to_string())
 
     # Text containing energy values:
     e_text = tkinter.Text(root, height=3, width=20)
@@ -93,13 +94,12 @@ def main():
     reg_i = root.register(_validate_int)
 
     # Text field containing potential amplitude
-    amp_label_text = tkinter.StringVar()
-    amp_label_text.set("Potential Amp:")
+    amp_label_text = tkinter.StringVar(value="Potential Amp:")
     amp_label = tkinter.Label(root, textvariable=amp_label_text, height=2)
 
-    amp_text = tkinter.Entry(root)
+    amp_text = tkinter.Entry(
+        root, validate="key", validatecommand=(reg_f, '%P'))
     amp_text.insert(tkinter.END, "0")
-    amp_text.config(validate="key", validatecommand=(reg_f, '%P'))
 
     # solve the problem with initial choice
     x, funcs, V, vals = solve_problem(e_text, potential_choice, potential_amp)
@@ -136,18 +136,18 @@ def main():
         command=lambda: inc_dec.plot_potential())
 
     # change well minimum and maximum
-    min_entry = tkinter.Entry(root)
+    min_entry = tkinter.Entry(
+        root, validate="key", validatecommand=(reg_f, '%P'))
     min_entry.insert(tkinter.END, str(min(x)))
-    min_entry.config(validate="key", validatecommand=(reg_f, '%P'))
 
-    max_entry = tkinter.Entry(root)
+    max_entry = tkinter.Entry(
+        root, validate="key", validatecommand=(reg_f, '%P'))
     max_entry.insert(tkinter.END, str(max(x)))
-    max_entry.config(validate="key", validatecommand=(reg_f, '%P'))
 
     # change dimension of Hamiltonian
-    eig_entry = tkinter.Entry(root)
+    eig_entry = tkinter.Entry(
+        root, validate="key", validatecommand=(reg_i, '%P'))
     eig_entry.insert(tkinter.END, "10")
-    eig_entry.config(validate="key", validatecommand=(reg_i, '%P'))
 
     # listbox to pick potential
     listbox.bind('<<ListboxSelect>>',
@@ -234,7 +234,7 @@ def _on_item_select(list_box, button_obj, e_text_obj, amp_text_obj,
         e_vals=e_vals, l_bnd=well_min, r_bnd=well_max)
 
     # update figure title
-    fig.suptitle(potential.name)
+    fig.suptitle(potential.to_string())
 
     # update button class
     button_obj.update_vals(x, funcs, V)
