@@ -132,8 +132,14 @@ def kronig_penney(ISW, amplitude):
 def hydrogen(ISW, amplitude):
     """Hydrogen Atom potential, ampltude equivalent to charge."""
     def h_atom(x):
-        return -amplitude / abs(x) if abs(x) > 1e-3 else -10000
+        return -amplitude / abs(x) if abs(x) > 1e-3 else h_atom(2e-3)
     return general_well(ISW, h_atom)
+
+def lennard_jones(ISW, amplitude):
+    """Lennard-Jones Potential, seen here: https://en.wikipedia.org/wiki/Lennard-Jones_potential."""
+    def lg(x):
+        return amplitude * (x**-12 - x**-6) if abs(x) > 1e-3 else lg(2e-3)
+    return general_well(ISW, lg)
 
 
 class PotentialType(Enum):
@@ -149,6 +155,7 @@ class PotentialType(Enum):
     coupled_quadratic = auto()   # WORKING
     kronig_penney = auto()       # WORKING
     hydrogen = auto()            # WORKING
+    lennard_jones = auto()       # WORKING
 
     def get_potential(self, ISW, amplitude):
         """From enum type, return the proper potential to compute."""
@@ -173,6 +180,8 @@ class PotentialType(Enum):
             return kronig_penney(ISW, amplitude)
         elif self is PotentialType.hydrogen:
             return hydrogen(ISW, amplitude)
+        elif self is PotentialType.lennard_jones:
+            return lennard_jones(ISW, amplitude)
 
     def to_string(self):
         """Return a properly formatted Potential Name."""
@@ -196,6 +205,8 @@ class PotentialType(Enum):
             return "Kronig-Penney Potential"
         elif self is PotentialType.hydrogen:
             return "Hydrogen Atom Potential"
+        elif self is PotentialType.lennard_jones:
+            return "Lennard-Jones Potential"
         else:
             return ""
 
