@@ -129,6 +129,12 @@ def kronig_penney(ISW, amplitude):
             return 0
     return general_well(ISW, kp)
 
+def hydrogen(ISW, amplitude):
+    """Hydrogen Atom potential, ampltude equivalent to charge."""
+    def h_atom(x):
+        return -amplitude / abs(x) if abs(x) > 1e-3 else -10000
+    return general_well(ISW, h_atom)
+
 
 class PotentialType(Enum):
     """Enumeration which contains all working potential types."""
@@ -142,6 +148,7 @@ class PotentialType(Enum):
     triangle_barrier = auto()    # WORKING
     coupled_quadratic = auto()   # WORKING
     kronig_penney = auto()       # WORKING
+    hydrogen = auto()            # WORKING
 
     def get_potential(self, ISW, amplitude):
         """From enum type, return the proper potential to compute."""
@@ -164,6 +171,33 @@ class PotentialType(Enum):
             return coupled_quadratic(ISW, amplitude)
         elif self is PotentialType.kronig_penney:
             return kronig_penney(ISW, amplitude)
+        elif self is PotentialType.hydrogen:
+            return hydrogen(ISW, amplitude)
+
+    def to_string(self):
+        """Return a properly formatted Potential Name."""
+        if self is PotentialType.square:
+            return "Square Well"
+        elif self is PotentialType.linear:
+            return "Linear Well"
+        elif self is PotentialType.quadratic:
+            return "Quadratic Potential"
+        elif self is PotentialType.centered_quadratic:
+            return "Centered Quadratic Potential"
+        elif self is PotentialType.square_barrier:
+            return "Square Barrier"
+        elif self is PotentialType.square_plus_linear:
+            return "Square + Linear Well"
+        elif self is PotentialType.triangle_barrier:
+            return "Triangle Barrier"
+        elif self is PotentialType.coupled_quadratic:
+            return "Double Quadratic Potential"
+        elif self is PotentialType.kronig_penney:
+            return "Kronig-Penney Potential"
+        elif self is PotentialType.hydrogen:
+            return "Hydrogen Atom Potential"
+        else:
+            return ""
 
 
 if __name__ == "__main__":

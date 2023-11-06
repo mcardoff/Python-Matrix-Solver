@@ -25,5 +25,4 @@ def compute_hamiltonian(V, ISW):
             row.append(el)
             el = 0.0
         hamiltonian.append(row)
-
     return hamiltonian
