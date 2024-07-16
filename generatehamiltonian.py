@@ -1,14 +1,16 @@
 """Generate the hamiltonian given a basis and potential."""
 from infinitesquarewell import InfiniteSquareWell
+import numpy as np
 
 
 def mel(psil, V, psir, ISW):
     """Compute matrix element using average value theorem."""
     assert(isinstance(ISW, InfiniteSquareWell))
     # discrete inner product: < left | V | right >
-    el = sum(l*v*r for (l, v, r) in zip(psil, V, psir))
+    mel_array = np.fromiter((l*v*r for (l, v, r) in zip(psil, V, psir)), float)
+    el = np.mean(mel_array)
     # readjust for avg val thm
-    return float(ISW.well_width * el / ISW.steps)
+    return float(ISW.well_width * el)
 
 
 def compute_hamiltonian(V, ISW):
