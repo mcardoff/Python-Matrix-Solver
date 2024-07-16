@@ -22,7 +22,7 @@ def solve_problem(text_obj, potential_choice, potential_amplitude,
     - Potential Form
     - Potential Amplitude
     - Well Width
-    - (TODO) Number of e-vals
+    - Number of e-vals
     """
     # get infinite square well basis
     ISW = InfiniteSquareWell(energy_eigenvals=e_vals,
